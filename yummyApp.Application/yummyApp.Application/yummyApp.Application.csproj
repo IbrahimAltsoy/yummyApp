@@ -10,4 +10,12 @@
     <None Include="..\..\.editorconfig" Link=".editorconfig" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\yummyApp.Domain\yummyApp.Domain\yummyApp.Domain.csproj" />
+  </ItemGroup>
+
 </Project>

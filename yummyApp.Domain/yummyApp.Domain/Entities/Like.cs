@@ -5,9 +5,10 @@ namespace yummyApp.Domain.Entities
     public class Like: BaseAuditableEntity<Guid>
     {
      
-        public int UserID { get; set; }
-        public int PostID { get; set; }
-        public User User { get; set; }
-        public Post Post { get; set; }
+        public Guid? UserID { get; set; }
+        public Guid? PostID { get; set; }
+
+        public User? User { get; set; }
+        public Post? Post { get; set; }
     }
 }

@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using yummyApp.Application.Abstract.DbContext;
 
 namespace yummyApp.Api.Controllers
 {
@@ -12,22 +14,39 @@ namespace yummyApp.Api.Controllers
         };
 
         private readonly ILogger<WeatherForecastController> _logger;
+        readonly IYummyAppDbContext _appDbContext;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
+        public WeatherForecastController(ILogger<WeatherForecastController> logger, IYummyAppDbContext appDbContext)
         {
             _logger = logger;
+            _appDbContext = appDbContext;
         }
 
-        [HttpGet(Name = "GetWeatherForecast")]
-        public IEnumerable<WeatherForecast> Get()
+        //[HttpGet(Name = "GetWeatherForecast")]
+        //public IEnumerable<WeatherForecast> Get()
+        //{
+        //    return Enumerable.Range(1, 5).Select(index => new WeatherForecast
+        //    {
+        //        Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
+        //        TemperatureC = Random.Shared.Next(-20, 55),
+        //        Summary = Summaries[Random.Shared.Next(Summaries.Length)]
+        //    })
+        //    .ToArray();
+        //}
+        [HttpGet]
+        public async Task<IActionResult> Business()
         {
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
+            var entity = await _appDbContext.Businesses.Select(u=> new
             {
-                Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                TemperatureC = Random.Shared.Next(-20, 55),
-                Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-            })
-            .ToArray();
+                u.Name,
+                u.City
+            }).ToListAsync();
+            if (entity == null)
+            {
+                return Ok("veritabaný boþ");
+            }
+
+            return Ok(entity);
         }
     }
 }

@@ -1,11 +1,21 @@
+using yummyApp.Persistance;
+using yummyApp.Infrastructure;
+using Swashbuckle.AspNetCore.SwaggerUI;
+using yummyApp.Persistance.Context;
+using yummyApp.Api;
+using yummyApp.Application;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllers();
+builder.Services.AddPersistanceServices(builder.Configuration);
+builder.Services.AddApplicationServices();
+builder.Services.AddInfrastructureServices();
+builder.Services.AddWebApiServices(builder.Configuration);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+//builder.Services.AddEndpointsApiExplorer();
+//builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
@@ -14,6 +24,8 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+
+    await app.InitializeDb();
 }
 
 app.UseHttpsRedirection();

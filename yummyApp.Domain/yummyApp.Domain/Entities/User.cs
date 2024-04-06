@@ -1,4 +1,5 @@
 ﻿using yummyApp.Domain.Common;
+using yummyApp.Domain.Enums;
 
 namespace yummyApp.Domain.Entities
 {
@@ -10,14 +11,16 @@ namespace yummyApp.Domain.Entities
         public string Email { get; set; }
         public string Password { get; set; }
         public string ConfirmPassword { get; set; }
+        public Gender Gender { get; set; }
+        public bool IsActive { get; set; }
         public string ProfilePicture { get; set; }
         public bool NotificationPreferences { get; set; }
         public bool PrivacySettings { get; set; }
 
-        public List<Post> Posts { get; set; }
-        public List<Like> Likes { get; set; }
-        public List<Comment> Comments { get; set; }
-        public int TotalRating
+        public List<Post>? Posts { get; set; }
+        public List<Like>? Likes { get; set; }
+        public List<Comment>? Comments { get; set; }
+        public int? TotalRating
         {
             get
             {
@@ -29,8 +32,8 @@ namespace yummyApp.Domain.Entities
                 return totalRating;
             }
         }
-        public List<Friendship> Followings { get; set; }
-        public List<Friendship> Followers { get; set; }
+        public List<Friendship>? Followings { get; set; }
+        public List<Friendship>? Followers { get; set; }
 
     }
 }
