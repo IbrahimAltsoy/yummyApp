@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-
 using yummyApp.Application.Abstract.DbContext;
 using yummyApp.Application.Repositories.Repository;
 using yummyApp.Infrastructure.Identity;
@@ -19,6 +18,12 @@ namespace yummyApp.Persistance
             //services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
             //services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventsInterceptor>();
             services.AddScoped<IBusinessRepository, BusinessRepository>();
+            services.AddScoped<ICommentRepository, CommentRepository>();
+            services.AddScoped<IFriendShipRepository, FriendShipRepository>();
+            services.AddScoped<ILikeRepository, LikeRepository>();
+            services.AddScoped<IPostRepository, PostRepository>();
+            services.AddScoped<ITagRepository, TagRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
             services.AddDbContext<YummyAppDbContext>((sp, options) =>
             {
                 options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
