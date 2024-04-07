@@ -39,7 +39,12 @@ namespace yummyApp.Api.Controllers
             var entity = await _appDbContext.Businesses.Select(u=> new
             {
                 u.Name,
-                u.City
+                u.City,
+                u.Description,
+                u.Phone,
+                u.CreatedAt,
+                u.Address
+                
             }).ToListAsync();
             if (entity == null)
             {
