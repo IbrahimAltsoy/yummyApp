@@ -9,7 +9,7 @@ using yummyApp.Application.Dynamic;
 using yummyApp.Application.Paging;
 using yummyApp.Domain.Common;
 
-namespace yummyApp.Application.Repository
+namespace yummyApp.Application.Repositories
 {
     public interface IRepository<TEntity, TKey> : IQuery<TEntity> where TEntity : IEntity<TKey>
     {

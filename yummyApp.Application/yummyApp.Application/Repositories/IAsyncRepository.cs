@@ -4,7 +4,7 @@ using yummyApp.Application.Dynamic;
 using yummyApp.Application.Paging;
 using yummyApp.Domain.Common;
 
-namespace yummyApp.Application.Repository
+namespace yummyApp.Application.Repositories
 {
     public interface IAsyncRepository<TEntity, TKey> : IQuery<TEntity>
     where TEntity : BaseAuditableEntity<TKey>

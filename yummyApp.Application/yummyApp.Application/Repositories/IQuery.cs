@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace yummyApp.Application.Repository
+namespace yummyApp.Application.Repositories
 {
     public interface IQuery<T>
     {

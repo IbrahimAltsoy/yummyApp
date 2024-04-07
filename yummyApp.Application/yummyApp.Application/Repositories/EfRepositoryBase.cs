@@ -9,7 +9,7 @@ using yummyApp.Domain.Common;
 using System.Collections;
 using yummyApp.Application.Dynamic;
 
-namespace yummyApp.Application.Repository
+namespace yummyApp.Application.Repositories
 {
     public class EfRepositoryBase<TEntity, TKey, TContext> : IAsyncRepository<TEntity, TKey>, IRepository<TEntity, TKey>
      where TEntity : BaseAuditableEntity<TKey>

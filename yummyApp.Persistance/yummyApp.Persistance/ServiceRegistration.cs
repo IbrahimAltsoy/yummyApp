@@ -4,9 +4,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 using yummyApp.Application.Abstract.DbContext;
+using yummyApp.Application.Repositories.Repository;
 using yummyApp.Infrastructure.Identity;
 using yummyApp.Persistance.Context;
 using yummyApp.Persistance.Interceptors;
+using yummyApp.Persistance.Repositories;
 
 namespace yummyApp.Persistance
 {
@@ -16,7 +18,7 @@ namespace yummyApp.Persistance
         {
             //services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
             //services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventsInterceptor>();
-
+            services.AddScoped<IBusinessRepository, BusinessRepository>();
             services.AddDbContext<YummyAppDbContext>((sp, options) =>
             {
                 options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
