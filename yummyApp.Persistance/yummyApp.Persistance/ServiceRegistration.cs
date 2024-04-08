@@ -4,10 +4,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using yummyApp.Application.Abstract.DbContext;
 using yummyApp.Application.Repositories.Repository;
+using yummyApp.Application.UnitOfWork;
 using yummyApp.Infrastructure.Identity;
 using yummyApp.Persistance.Context;
 using yummyApp.Persistance.Interceptors;
 using yummyApp.Persistance.Repositories;
+using yummyApp.Persistance.UnitOfWorks;
 
 namespace yummyApp.Persistance
 {
@@ -24,6 +26,9 @@ namespace yummyApp.Persistance
             services.AddScoped<IPostRepository, PostRepository>();
             services.AddScoped<ITagRepository, TagRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IMediaRepository, MediaRepository>();
+
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddDbContext<YummyAppDbContext>((sp, options) =>
             {
                 options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
