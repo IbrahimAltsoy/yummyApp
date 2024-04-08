@@ -4,15 +4,14 @@ using yummyApp.Domain.Entities;
 
 namespace yummyApp.Persistance.Configurations
 {
-    public class FriendshipConfiguration : IEntityTypeConfiguration<Friendship>
+    public class LikeConfigration : IEntityTypeConfiguration<Like>
     {
-        public void Configure(EntityTypeBuilder<Friendship> builder)
+        public void Configure(EntityTypeBuilder<Like> builder)
         {
             builder
-                 .Property (x => x.FolloweeID);
-
+                .Property(x => x.UserID).IsRequired();
             builder
-                 .Property(x => x.FollowerID);
+               .Property(x => x.PostID).IsRequired();
         }
     }
 }

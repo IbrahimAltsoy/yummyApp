@@ -1,4 +1,5 @@
-﻿using yummyApp.Domain.Common;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using yummyApp.Domain.Common;
 using yummyApp.Domain.Enums;
 
 namespace yummyApp.Domain.Entities
@@ -10,6 +11,7 @@ namespace yummyApp.Domain.Entities
         public string Username { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
+        //[NotMapped]
         public string ConfirmPassword { get; set; }
         public Gender Gender { get; set; }
         public bool IsActive { get; set; }

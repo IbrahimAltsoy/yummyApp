@@ -84,7 +84,7 @@ namespace yummyApp.Api.Controllers
             Business business = await _repository.AddAsync(new()
             {
                 Id = Guid.NewGuid(),
-                Name ="Faruk",
+                Name = "Kodunuzu Basitleþtirin: Sorunun kaynaðýný belirlemek için kodunuzu basitleþtirin. Örneðin, include kýsmýný kaldýrarak sadece GetList metodunu çaðýrýn ve sonucu kontrol edin. Eðer sorunun kaynaðýný bulursanýz, koda geri dönerek sorunu giderin.",
                 Address = "Van",
                 Phone = "5345455555",
                 City = "Van/Ýpekyolu",

@@ -1,10 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using yummyApp.Domain.Entities;
 
 namespace yummyApp.Persistance.Configurations
@@ -16,12 +11,19 @@ namespace yummyApp.Persistance.Configurations
             builder.HasMany(u => u.Followings)
                 .WithOne(f => f.Follower)
                 .HasForeignKey(f => f.FollowerID);
-
-
+            builder.Property(x => x.Name).HasMaxLength(50).IsRequired();
+            builder.Property(x => x.Surname).HasMaxLength(50).IsRequired();
+            builder.Property(x => x.Username).HasMaxLength(50).IsRequired();
+            builder.Property(x => x.Email).HasMaxLength(50)
+                .HasConversion(email => email.ToLower(), email => email)
+                .IsRequired();
+            builder.Property(x => x.Password).HasMaxLength(50)
+                .IsRequired();
+            builder.Property(x => x.Gender).IsRequired();
             builder.HasMany(u => u.Followers)
                 .WithOne(f => f.Followee)
                 .HasForeignKey(f => f.FolloweeID);
-                
+
         }
     }
 }

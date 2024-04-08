@@ -1,14 +1,8 @@
 ﻿using Bogus;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using yummyApp.Application.Abstract.DbContext;
 using yummyApp.Domain.Entities;
 using yummyApp.Domain.Enums;
 using yummyApp.Infrastructure.Common;
-using yummyApp.Persistance.Context;
 
 namespace yummyApp.Persistance.Seeders
 {
