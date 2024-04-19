@@ -17,7 +17,7 @@ namespace yummyApp.Application
             services.AddMediatR(media =>
             {
                 media.RegisterServicesFromAssembly(assembly);
-                media.AddOpenBehavior(typeof(PerformanceBehaviour<,>));
+                //media.AddOpenBehavior(typeof(PerformanceBehaviour<,>));
                 media.AddOpenBehavior(typeof(ValidationBehaviour<,>));
                 media.AddOpenBehavior(typeof(UnhandledExceptionBehaviour<,>));
             });

@@ -39,7 +39,7 @@ namespace yummyApp.Persistance
 
             services.AddSingleton(TimeProvider.System);
 
-           
+            
 
             ////services.AddDatabaseDeveloperPageExceptionFilter();
             //services
@@ -53,9 +53,9 @@ namespace yummyApp.Persistance
             //    .AddRoles<ApplicationRole>()
             //    .AddEntityFrameworkStores<YummyAppDbContext>();
 
-           
 
-          
+
+
             //services.AddScoped<IdentitySeeder>();
             //services.AddAuthorization();
 
@@ -63,10 +63,10 @@ namespace yummyApp.Persistance
             //services.AddScoped(typeof(IRepository<,>), typeof(BaseRepository<,>));
             //services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-           
+
             //services.AddScoped<INotificationRepository, NotificationRepository>();
 
-            
+
             //services.AddStackExchangeRedisCache(options =>
             //{
             //    options.Configuration = configuration["Redis"];

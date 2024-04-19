@@ -66,5 +66,6 @@ namespace yummyApp.Application.Repositories
         Task<TEntity> DeleteAsync(TEntity entity, bool permanent = false);
 
         Task<ICollection<TEntity>> DeleteRangeAsync(ICollection<TEntity> entity, bool permanent = false);
+        Task<string> SoftDelete(TKey id);
     }
 }

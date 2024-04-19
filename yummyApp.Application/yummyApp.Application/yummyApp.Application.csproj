@@ -22,8 +22,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Features\Businesses\Commands\DeleteBusiness\" />
-    <Folder Include="Features\Businesses\Commands\UpdateBusiness\" />
     <Folder Include="Features\Businesses\Queries\" />
     <Folder Include="Features\Comments\" />
     <Folder Include="Features\FriendShips\" />

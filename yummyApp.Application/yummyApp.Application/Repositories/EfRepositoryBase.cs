@@ -8,6 +8,7 @@ using yummyApp.Application.Paging;
 using yummyApp.Domain.Common;
 using System.Collections;
 using yummyApp.Application.Dynamic;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace yummyApp.Application.Repositories
 {
@@ -61,10 +62,20 @@ namespace yummyApp.Application.Repositories
 
         public async Task<TEntity> DeleteAsync(TEntity entity, bool permanent = false)
         {
-            await SetEntityAsDeletedAsync(entity, permanent);
-            await Context.SaveChangesAsync();
-            return entity;
+            var deletedEntity = await GetAsync(x => x.Id.ToString() == entity.Id.ToString());
+            if (deletedEntity != null)
+            {
+                await setEntityAsSoftDeletedAsync(deletedEntity);
+                await Context.SaveChangesAsync();
+                return entity;
+            }
+            else
+            {
+                return entity;
+            }
+            
         }
+
 
         public async Task<ICollection<TEntity>> DeleteRangeAsync(ICollection<TEntity> entities, bool permanent = false)
         {
@@ -325,14 +336,39 @@ namespace yummyApp.Application.Repositories
         {
             if (!permanent)
             {
-                CheckHasEntityHaveOneToOneRelation(entity);
-                await setEntityAsSoftDeletedAsync(entity);
+                if (entity.DeletedAt.HasValue)
+                    return;
+
+                entity.DeletedAt = DateTime.UtcNow;
+                entity.LastModifiedAt = DateTime.UtcNow;
+                //Context.Update(entity);
+                await Context.SaveChangesAsync();
+                //Context.Entry(entity).State = EntityState.Modified;
             }
             else
             {
                 Context.Remove(entity);
             }
+
+            // İlişkili entity'leri işle
+            foreach (var navigationEntry in Context.Entry(entity).Navigations)
+            {
+                if (navigationEntry is CollectionEntry collectionEntry && collectionEntry.CurrentValue != null)
+                {
+                    foreach (var dependentEntity in collectionEntry.CurrentValue)
+                    {
+                        await SetEntityAsDeletedAsync((TEntity)dependentEntity, permanent);
+                    }
+                }
+                else if (navigationEntry is ReferenceEntry referenceEntry && referenceEntry.CurrentValue != null)
+                {
+                    await SetEntityAsDeletedAsync((TEntity)referenceEntry.CurrentValue, permanent);
+                }
+            }
         }
+
+
+
 
         protected async Task SetEntityAsDeletedAsync(IEnumerable<TEntity> entities, bool permanent)
         {
@@ -396,6 +432,7 @@ namespace yummyApp.Application.Repositories
             if (entity.DeletedAt.HasValue)
                 return;
             entity.DeletedAt = DateTime.UtcNow;
+            Context.Update(entity);
 
             var navigations = Context
                 .Entry(entity)
@@ -410,35 +447,16 @@ namespace yummyApp.Application.Repositories
                     continue;
 
                 object? navValue = navigation.PropertyInfo.GetValue(entity);
-                if (navigation.IsCollection)
+                if (navigation.IsCollection && navValue != null)
                 {
-                    if (navValue == null)
-                    {
-                        IQueryable query = Context.Entry(entity).Collection(navigation.PropertyInfo.Name).Query();
-                        navValue = await GetRelationLoaderQuery(query, navigationPropertyType: navigation.PropertyInfo.GetType()).ToListAsync();
-                        if (navValue == null)
-                            continue;
-                    }
-
                     foreach (TEntity navValueItem in (IEnumerable)navValue)
                         await setEntityAsSoftDeletedAsync(navValueItem);
                 }
-                else
+                else if (!navigation.IsCollection && navValue != null)
                 {
-                    if (navValue == null)
-                    {
-                        IQueryable query = Context.Entry(entity).Reference(navigation.PropertyInfo.Name).Query();
-                        navValue = await GetRelationLoaderQuery(query, navigationPropertyType: navigation.PropertyInfo.GetType())
-                            .FirstOrDefaultAsync();
-                        if (navValue == null)
-                            continue;
-                    }
-
                     await setEntityAsSoftDeletedAsync((TEntity)navValue);
                 }
             }
-
-            Context.Update(entity);
         }
 
         private void setEntityAsSoftDeleted(TEntity entity)
@@ -489,5 +507,19 @@ namespace yummyApp.Application.Repositories
             Context.Update(entity);
         }
 
+        public async Task<string> SoftDelete(TKey id)
+        {
+            var entityItem = await GetAsync(x => x.Id.ToString()==id.ToString());
+
+            if (entityItem == null) return "exist item";
+            if (entityItem.DeletedAt.HasValue)
+                return "Entity is deleted before" ;
+
+            entityItem.DeletedAt = DateTime.UtcNow;
+
+            Context.Update(entityItem);
+           await Context.SaveChangesAsync();
+            return entityItem.DeletedAt.ToString();
+        }
     }
 }

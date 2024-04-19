@@ -2,6 +2,9 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using yummyApp.Application.Features.Businesses.Commands.CreateBusiness;
+using yummyApp.Application.Features.Businesses.Commands.DeleteBusiness;
+using yummyApp.Application.Features.Businesses.Commands.UpdateBusiness;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace yummyApp.Api.Controllers
 {
@@ -19,8 +22,25 @@ namespace yummyApp.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(CreateBusinessCommand command)
         {
-            var response =await _mediator.Send(command);
-            var x = 5;
+            var response = await _mediator.Send(command);
+            return Ok(response);
+        }
+        [HttpPut]
+        public async Task<IActionResult> Update(UpdateBusinessCommand request, Guid id)
+        {
+            if (id == request.Id)
+            {
+                var response = await _mediator.Send(request);
+                int a = 4;
+                return Ok(response);
+            }
+            else return Ok(false);
+
+        }
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete([FromBody] DeleteBusinessRequest request)
+        {
+            DeleteBusinessResponse response = await _mediator.Send(request);
             return Ok(response);
         }
     }

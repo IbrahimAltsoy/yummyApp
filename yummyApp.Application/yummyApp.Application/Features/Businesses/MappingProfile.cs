@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore.Storage.Json;
 using yummyApp.Application.Features.Businesses.Commands.CreateBusiness;
+using yummyApp.Application.Features.Businesses.Commands.DeleteBusiness;
+using yummyApp.Application.Features.Businesses.Commands.UpdateBusiness;
 using yummyApp.Domain.Entities;
 
 namespace yummyApp.Application.Features.Businesses
@@ -10,6 +12,10 @@ namespace yummyApp.Application.Features.Businesses
       public MappingProfile()
         {
             CreateMap<Business, CreateBusinessCommand>().ReverseMap();
+            CreateMap<Business, UpdateBusinessCommand>().ReverseMap();
+
+            CreateMap<Business, DeleteBusinessRequest>().ReverseMap();
+            CreateMap<Business, DeleteBusinessResponse>().ReverseMap();
          
         }
     }
