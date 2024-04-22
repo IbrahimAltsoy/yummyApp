@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using yummyApp.Application.Features.Businesses.Commands.CreateBusiness;
 using yummyApp.Application.Features.Businesses.Commands.DeleteBusiness;
 using yummyApp.Application.Features.Businesses.Commands.UpdateBusiness;
+using yummyApp.Application.Features.Businesses.Queries.GetAll;
+using yummyApp.Application.Features.Businesses.Queries.GetById;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace yummyApp.Api.Controllers
@@ -18,8 +20,19 @@ namespace yummyApp.Api.Controllers
         {
             _mediator = mediator;
         }
-
-        [HttpPost]
+        [HttpGet]
+        public async Task<IActionResult> Get([FromQuery]GetAllBusinessQueryRequest request)
+        {
+            IList<GetAllBusinessQueryResponse> response = await _mediator.Send(request);
+            return Ok(response);
+        }
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById([FromQuery]GetByIdQueryRequest request)
+        {
+            GetByIdQueryResponse response = await _mediator.Send(request);
+            return Ok(response);
+        }
+        [HttpPost] 
         public async Task<IActionResult> Create(CreateBusinessCommand command)
         {
             var response = await _mediator.Send(command);

@@ -17,7 +17,7 @@ namespace yummyApp.Application.Features.Businesses.EventHandlers
         {
             //LOG
             var eventName = notification.GetType().Name;
-            _logger.LogInformation($"CustomerCreatedEventHandler is working. Event: {eventName}");
+            _logger.LogInformation($"BusinessCreatedEventHandler is working. Event: {eventName}");
             return Task.CompletedTask;
 
             //NOTIFY
