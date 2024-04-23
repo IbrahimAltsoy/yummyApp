@@ -22,7 +22,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Features\Comments\Queries\" />
     <Folder Include="Features\FriendShips\" />
     <Folder Include="Features\Likes\" />
     <Folder Include="Features\Medias\" />
