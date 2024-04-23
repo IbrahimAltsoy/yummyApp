@@ -36,7 +36,6 @@ namespace yummyApp.Application.Features.Businesses.Commands.CreateBusiness
             var entity = _mapper.Map<Business>(request);
             var result = await  _businessRepository.AddAsync(entity);
              entity.AddDomainEvent(new BusinessCreatedEvent(entity));
-            int a = 5;
             return result.Name;
         }
     }

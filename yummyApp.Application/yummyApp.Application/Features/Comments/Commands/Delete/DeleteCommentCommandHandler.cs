@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using MediatR;
 using yummyApp.Application.Repositories.Repository;
+using yummyApp.Domain.Entities;
 
 namespace yummyApp.Application.Features.Comments.Commands.Delete
 {
@@ -15,9 +16,11 @@ namespace yummyApp.Application.Features.Comments.Commands.Delete
             _commentRepository = commentRepository;
         }
 
-        public Task<DeleteCommentCommandResponse> Handle(DeleteCommentCommandRequest request, CancellationToken cancellationToken)
+        public async Task<DeleteCommentCommandResponse> Handle(DeleteCommentCommandRequest request, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            var data = _mapper.Map<Comment>(request);
+            await _commentRepository.DeleteAsync(data);
+            return new();
         }
     }
 }

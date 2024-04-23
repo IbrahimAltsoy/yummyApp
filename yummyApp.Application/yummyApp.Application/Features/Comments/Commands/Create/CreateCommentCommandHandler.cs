@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using MediatR;
 using yummyApp.Application.Repositories.Repository;
+using yummyApp.Domain.Entities;
+using yummyApp.Domain.Events;
 
 namespace yummyApp.Application.Features.Comments.Commands.Create
 {
@@ -15,9 +17,12 @@ namespace yummyApp.Application.Features.Comments.Commands.Create
             _commentRepository = commentRepository;
         }
 
-        public Task<CreateCommentCommandResponse> Handle(CreateCommentCommandRequest request, CancellationToken cancellationToken)
+        public async Task<CreateCommentCommandResponse> Handle(CreateCommentCommandRequest request, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            var data = _mapper.Map<Comment>(request);
+            await _commentRepository.AddAsync(data);
+            data.AddDomainEvent(new CommentCreatedEvent(data));
+            return new();
         }
     }
 }
