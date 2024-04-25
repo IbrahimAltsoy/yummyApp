@@ -2,5 +2,8 @@
 
 namespace yummyApp.Application.Repositories.Repository
 {
-    public interface ILikeRepository: IAsyncRepository<Like, Guid>, IRepository<Like, Guid> { }
+    public interface ILikeRepository: IAsyncRepository<Like, Guid>, IRepository<Like, Guid> 
+    
+    { Task<List<User>> UsersWhoLikedAsync(Guid postId); }
+    
 }

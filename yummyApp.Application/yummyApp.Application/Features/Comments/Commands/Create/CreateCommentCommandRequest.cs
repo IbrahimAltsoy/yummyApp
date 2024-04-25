@@ -9,8 +9,5 @@ namespace yummyApp.Application.Features.Comments.Commands.Create
         public Guid? PostID { get; set; }
         public string Content { get; set; }
         public DateTime Timestamp { get; set; }
-        
-        //public User? User { get; set; }
-        //public Post? Post { get; set; }
     }
 }

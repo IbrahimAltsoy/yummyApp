@@ -22,8 +22,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Features\FriendShips\" />
-    <Folder Include="Features\Likes\" />
+    <Folder Include="Features\FriendShips\Commands\Delete\" />
+    <Folder Include="Features\FriendShips\Commands\Update\" />
+    <Folder Include="Features\FriendShips\EventHandlers\" />
+    <Folder Include="Features\FriendShips\Queries\GetById\" />
+    <Folder Include="Features\Likes\EventHandlers\" />
     <Folder Include="Features\Medias\" />
     <Folder Include="Features\Posts\EventHandler\" />
     <Folder Include="Features\Posts\Queries\" />
