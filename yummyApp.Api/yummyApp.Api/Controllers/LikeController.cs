@@ -2,7 +2,8 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Client;
-using yummyApp.Application.Features.Likes.Commands;
+using yummyApp.Application.Features.Likes.Commands.Create;
+using yummyApp.Application.Features.Likes.Commands.Delete;
 using yummyApp.Application.Features.Likes.Queries.GetAll;
 
 namespace yummyApp.Api.Controllers
@@ -29,6 +30,11 @@ namespace yummyApp.Api.Controllers
         {
             CreateLikecommandResponse response = await _mediator.Send(request);
             return Ok(response);
+        }
+        [HttpDelete]
+        public async Task<IActionResult> Delete([FromBody]DeleteLikeCommandRequest request)
+        {
+            DeleteLikeCommandResponse response = await _mediator.Send(request); return Ok(response);
         }
     }
 }

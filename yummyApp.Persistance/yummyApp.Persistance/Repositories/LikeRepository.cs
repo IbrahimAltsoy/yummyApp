@@ -18,7 +18,7 @@ namespace yummyApp.Persistance.Repositories
         public async Task<List<User>> UsersWhoLikedAsync(Guid postId)
         {
             var likes = await Context.Likes
-            .Where(l => l.PostID == postId)
+            .Where(l => l.PostID == postId && l.DeletedAt == null)
             .Select(l => l.UserID)
             .ToListAsync();
             var usersWhoLiked = await Context.Users

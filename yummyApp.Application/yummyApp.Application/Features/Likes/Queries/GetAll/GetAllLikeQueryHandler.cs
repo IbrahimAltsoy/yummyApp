@@ -29,7 +29,7 @@ namespace yummyApp.Application.Features.Likes.Queries.GetAll
             {
                 Name = user.Name,
                 Surname = user.Surname,
-                //LikeCount = usersWhoLiked.Count // Burada beğeni sayısını doldurmanız gerekecek
+                //LikeCount = usersWhoLiked.Count // beğeni sayısı için ayrı bir handle sınıfı oluşturabilirsin
             }).ToList();
             return responseList;
         }

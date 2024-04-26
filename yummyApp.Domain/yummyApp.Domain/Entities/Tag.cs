@@ -6,7 +6,7 @@ namespace yummyApp.Domain.Entities
     {
         public Guid? PostID { get; set; }
         public Guid? OfficeID { get; set; }
-
+        // OfficeId yi BusinessId olarak değiştir değiştirince yorumu sil 
         public Post? Post { get; set; }
         public Business? Business { get; set; }
     }
