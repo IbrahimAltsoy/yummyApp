@@ -5,7 +5,7 @@ namespace yummyApp.Domain.Entities
     public class Tag : BaseAuditableEntity<Guid>
     {
         public Guid? PostID { get; set; }
-        public Guid? OfficeID { get; set; }
+        public Guid? BusinessID { get; set; }
         // OfficeId yi BusinessId olarak değiştir değiştirince yorumu sil 
         public Post? Post { get; set; }
         public Business? Business { get; set; }
