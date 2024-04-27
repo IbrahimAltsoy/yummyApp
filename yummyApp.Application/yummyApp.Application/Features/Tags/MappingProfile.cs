@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using yummyApp.Application.Features.Tags.Commands.Create;
+using yummyApp.Application.Features.Tags.Commands.Update;
 using yummyApp.Domain.Entities;
 
 namespace yummyApp.Application.Features.Tags
@@ -9,6 +10,7 @@ namespace yummyApp.Application.Features.Tags
         public MappingProfile()
         {
             CreateMap<Tag, CreateTagCommandRequest>().ReverseMap();
+            CreateMap<Tag, UpdateTagCommandRequest>().ReverseMap();
         }
     }
 }
