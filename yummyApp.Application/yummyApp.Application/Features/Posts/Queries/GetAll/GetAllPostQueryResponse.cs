@@ -1,0 +1,16 @@
+﻿using yummyApp.Domain.Enums;
+
+namespace yummyApp.Application.Features.Posts.Queries.GetAll
+{
+    public class GetAllPostQueryResponse
+    {
+        //public Guid? UserID { get; set; }
+        public string UserName { get; set; }
+        public string UserSurname { get; set; }
+        public string? Title { get; set; }
+        public string Content { get; set; }
+        public DateTime Timestamp { get; set; }
+        public PostQuality Quality { get; set; }
+        public int Rating { get; set; }
+    }
+}

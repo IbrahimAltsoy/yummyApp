@@ -4,7 +4,7 @@ using yummyApp.Application.Repositories.Repository;
 using yummyApp.Domain.Entities;
 using yummyApp.Domain.Events;
 
-namespace yummyApp.Application.Features.Posts.Commands
+namespace yummyApp.Application.Features.Posts.Commands.Create
 {
     public class CreatePostCommandHandler : IRequestHandler<CreatePostCommandRequest, CreatePostCommandResponse>
     {

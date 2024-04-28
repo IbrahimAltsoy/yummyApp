@@ -7,7 +7,7 @@ namespace yummyApp.Domain.Entities
     public class Post: BaseAuditableEntity<Guid>
     {
         public Guid? UserID { get; set; }
-        //public string? Title { get; set; }
+        public string? Title { get; set; }
         public string Content { get; set; }
         public DateTime Timestamp { get; set; }
         public PostQuality Quality { get; set; }

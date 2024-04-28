@@ -1,11 +1,13 @@
 ﻿using MediatR;
 using yummyApp.Domain.Enums;
 
-namespace yummyApp.Application.Features.Posts.Commands
+namespace yummyApp.Application.Features.Posts.Commands.Update
 {
-    public class CreatePostCommandRequest:IRequest<CreatePostCommandResponse>
+    public class UpdatePostCommandRequest:IRequest<UpdatePostCommandResponse>
     {
+        public Guid Id { get; set; }
         public Guid? UserID { get; set; }
+        public string? Title { get; set; }
         public string Content { get; set; }
         public DateTime Timestamp { get; set; }
         public PostQuality Quality { get; set; }
