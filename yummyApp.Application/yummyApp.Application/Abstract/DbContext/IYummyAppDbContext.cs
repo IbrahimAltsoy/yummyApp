@@ -11,6 +11,8 @@ namespace yummyApp.Application.Abstract.DbContext
         DbSet<Like> Likes { get; }
         DbSet<Post> Posts { get; }
         DbSet<Tag> Tags { get; }
+        DbSet<BusinessLocation> BusinessLocations { get; }
+        DbSet<PostLocation> PostLocations { get; }
         DbSet<User> Users { get; }
 
 

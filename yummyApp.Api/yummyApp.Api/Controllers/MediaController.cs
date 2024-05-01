@@ -5,7 +5,6 @@ using yummyApp.Application.Features.Medias.Commands.Create;
 using yummyApp.Application.Features.Medias.Commands.Delete;
 using yummyApp.Application.Features.Medias.Commands.Update;
 using yummyApp.Application.Features.Medias.Queries.GetAll;
-using yummyApp.Persistance.Migrations;
 
 namespace yummyApp.Api.Controllers
 {

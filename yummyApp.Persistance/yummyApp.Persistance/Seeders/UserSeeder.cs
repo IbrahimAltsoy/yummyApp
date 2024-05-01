@@ -23,9 +23,9 @@ namespace yummyApp.Persistance.Seeders
                 Name = "Admin",
                 Surname= "Admin",
                 IsActive = true,
-                ProfilePicture="string",
-                PrivacySettings= true,
-                NotificationPreferences=true,
+                //ProfilePicture="string",
+                //PrivacySettings= true,
+                //NotificationPreferences=true,
 
             };
             await context.Users.AddAsync(adminUser);
@@ -37,11 +37,11 @@ namespace yummyApp.Persistance.Seeders
                 .RuleFor(u => u.Username, (f, u) => f.Internet.UserName(u.Name, u.Surname))
                 .RuleFor(u => u.Email, (f, u) => f.Internet.Email(u.Name, u.Surname))
                 .RuleFor(u => u.Password, "Yummy123." /*AccountHelper.HashCreate("123qwe")*/)
-                .RuleFor(u => u.Gender, f => f.PickRandom<Gender>())
-                .RuleFor(u => u.ProfilePicture, f => f.Image.ToString())
-                .RuleFor(u => u.IsActive, f => f.Random.Bool())
-                .RuleFor(u => u.NotificationPreferences, f => f.Random.Bool())
-                .RuleFor(u => u.PrivacySettings, f => f.Random.Bool());
+                //.RuleFor(u => u.Gender, f => f.PickRandom<Gender>())
+                //.RuleFor(u => u.ProfilePicture, f => f.Image.ToString())
+                .RuleFor(u => u.IsActive, f => f.Random.Bool());
+                //.RuleFor(u => u.NotificationPreferences, f => f.Random.Bool())
+                //.RuleFor(u => u.PrivacySettings, f => f.Random.Bool());
             var list = faker.Generate(100);
             await context.Users.AddRangeAsync(list);
 

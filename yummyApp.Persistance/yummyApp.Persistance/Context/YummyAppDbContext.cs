@@ -25,6 +25,8 @@ public class YummyAppDbContext : IdentityDbContext<ApplicationUser, ApplicationR
     public DbSet<Post> Posts { get; set; }
     public DbSet<Tag> Tags { get; set; }
     public DbSet<Media> Medias { get; set; }
+    public DbSet<BusinessLocation> BusinessLocations { get; set; }
+    public DbSet<PostLocation> PostLocations { get; set; }
     public DbSet<User> Users { get; set; }
 
     public YummyAppDbContext(DbContextOptions<YummyAppDbContext> options, IHttpContextAccessor httpContextAccessor) : base(options)
@@ -35,16 +37,41 @@ public class YummyAppDbContext : IdentityDbContext<ApplicationUser, ApplicationR
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+        modelBuilder.Entity<Friendship>()
+         .HasOne(f => f.Follower)
+         .WithMany()
+         .HasForeignKey(f => f.FollowerID)
+         .OnDelete(DeleteBehavior.Restrict);
 
+        modelBuilder.Entity<Friendship>()
+            .HasOne(f => f.Followee)
+            .WithMany()
+            .HasForeignKey(f => f.FolloweeID)
+            .OnDelete(DeleteBehavior.Restrict);
+        modelBuilder.Entity<User>()
+       .HasMany(u => u.ReceivedMessages)
+       .WithOne(m => m.Receiver)
+       .HasForeignKey(m => m.ReceiverId)
+       .OnDelete(DeleteBehavior.Restrict);
         // Foreign key ilişkileri için silme davranışını sınırlayın
         foreach (var relationship in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
         {
             relationship.DeleteBehavior = DeleteBehavior.Restrict;
         }
 
-        // Fluent API konfigürasyonlarını uygulayın
+        // Fluent API konfigürasyonlarını uygulamak
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+        // Business ve BusinessLocation arasındaki ilişkiyi belirle
+        //modelBuilder.Entity<Business>()
+        //.HasOne(b => b.Location)
+        //.WithOne(l => l.Business)
+        //.HasForeignKey<BusinessLocation>(l => l.Id);
 
+       // modelBuilder.Entity<Post>()
+       //.HasOne(p => p.PostLocation)
+       //.WithOne(pl => pl.Post)
+       //.HasForeignKey<Post>(p => p.PostLocationId)
+       //.IsRequired(false);
     }
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

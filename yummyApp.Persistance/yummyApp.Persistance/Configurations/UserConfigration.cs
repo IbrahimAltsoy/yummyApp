@@ -8,9 +8,9 @@ namespace yummyApp.Persistance.Configurations
     {
         public void Configure(EntityTypeBuilder<User> builder)
         {
-            builder.HasMany(u => u.Followings)
-                .WithOne(f => f.Follower)
-                .HasForeignKey(f => f.FollowerID);
+            //builder.HasMany(u => u.Followings)
+            //    .WithOne(f => f.Follower)
+            //    .HasForeignKey(f => f.FollowerID);
             builder.Property(x => x.Name).HasMaxLength(50).IsRequired();
             builder.Property(x => x.Surname).HasMaxLength(50).IsRequired();
             builder.Property(x => x.Username).HasMaxLength(50).IsRequired();
@@ -20,9 +20,9 @@ namespace yummyApp.Persistance.Configurations
             builder.Property(x => x.Password).HasMaxLength(50)
                 .IsRequired();
             builder.Property(x => x.Gender).IsRequired();
-            builder.HasMany(u => u.Followers)
-                .WithOne(f => f.Followee)
-                .HasForeignKey(f => f.FolloweeID);
+            //builder.HasMany(u => u.Followers)
+            //    .WithOne(f => f.Followee)
+            //    .HasForeignKey(f => f.FolloweeID);
 
         }
     }
