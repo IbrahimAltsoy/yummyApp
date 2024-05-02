@@ -20,6 +20,8 @@ namespace yummyApp.Application.Features.Comments.Commands.Update
         {
             var comment = await _commentRepository.GetAsync(x => x.Id == request.Id);
             comment.Content = request.Content;
+            comment.Title = request.Title;
+            comment.LikeCount = request.LikeCount;
             await _commentRepository.UpdateAsync(comment);
             return new();
         }

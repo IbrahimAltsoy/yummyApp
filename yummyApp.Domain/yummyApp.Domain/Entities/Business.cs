@@ -17,6 +17,7 @@ namespace yummyApp.Domain.Entities
         public string Logo {  get; set; }
         public double Latitude { get; set; }
         public double Longitude { get; set; }
+        public BusinessQuality BusinessQuality { get; set; }
         public Guid OwnerUserId { get; set; }
         public ICollection<UserRating> Ratings { get; set; }
         public ICollection<BusinessReview> BusinessReviews { get; set; }

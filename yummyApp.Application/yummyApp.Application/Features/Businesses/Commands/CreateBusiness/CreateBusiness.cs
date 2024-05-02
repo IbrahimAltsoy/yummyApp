@@ -21,6 +21,7 @@ namespace yummyApp.Application.Features.Businesses.Commands.CreateBusiness
         public double Latitude { get; set; }
         public double Longitude { get; set; }
         public Guid OwnerUserId { get; set; }
+        public BusinessQuality BusinessQuality { get; set; }
     }
     public class CreateBusinessCommandHandler : IRequestHandler<CreateBusinessCommand, string>
     {

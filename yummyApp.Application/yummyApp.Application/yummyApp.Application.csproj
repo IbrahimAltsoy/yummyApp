@@ -26,6 +26,7 @@
     <Folder Include="Features\FriendShips\Commands\Update\" />
     <Folder Include="Features\FriendShips\EventHandlers\" />
     <Folder Include="Features\FriendShips\Queries\GetById\" />
+    <Folder Include="Features\Message\" />
     <Folder Include="Features\Tags\Commands\Delete\" />
     <Folder Include="Features\Users\Commands\Delete\" />
     <Folder Include="Features\Users\Commands\Update\" />
