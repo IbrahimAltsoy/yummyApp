@@ -22,5 +22,6 @@ namespace yummyApp.Domain.Entities
         public ICollection<UserRating> Ratings { get; set; }
         public ICollection<BusinessReview> BusinessReviews { get; set; }
         public ICollection<Post> Posts { get; set; }
+        //public ICollection<ApplicationUser> ApplicationUsers { get; set; }
     }
 }

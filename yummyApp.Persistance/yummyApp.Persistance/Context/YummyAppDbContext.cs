@@ -12,11 +12,12 @@ using Microsoft.EntityFrameworkCore.ValueGeneration;
 using yummyApp.Application.Abstract.DbContext;
 using yummyApp.Domain.Common;
 using yummyApp.Domain.Entities;
-using yummyApp.Infrastructure.Identity;
+using yummyApp.Domain.Identity;
 
-public class YummyAppDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, string>, IYummyAppDbContext
+public class YummyAppDbContext : IdentityDbContext<AppUser, UserRole, Guid>, IYummyAppDbContext
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
+
 
     public DbSet<Business> Businesses { get; set; }
     public DbSet<Comment> Comments { get; set; }
@@ -27,12 +28,17 @@ public class YummyAppDbContext : IdentityDbContext<ApplicationUser, ApplicationR
     public DbSet<Media> Medias { get; set; }
     public DbSet<BusinessLocation> BusinessLocations { get; set; }
     public DbSet<PostLocation> PostLocations { get; set; }
-    public DbSet<User> Users { get; set; }
+
+    public DbSet<AppUser> AppUsers { get; set; }
+
+   // public DbSet<User> Users { get; set; }
 
     public YummyAppDbContext(DbContextOptions<YummyAppDbContext> options, IHttpContextAccessor httpContextAccessor) : base(options)
     {
         _httpContextAccessor = httpContextAccessor;
     }
+
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -48,12 +54,12 @@ public class YummyAppDbContext : IdentityDbContext<ApplicationUser, ApplicationR
             .WithMany()
             .HasForeignKey(f => f.FolloweeID)
             .OnDelete(DeleteBehavior.Restrict);
-        modelBuilder.Entity<User>()
+        modelBuilder.Entity<AppUser>()
        .HasMany(u => u.ReceivedMessages)
        .WithOne(m => m.Receiver)
        .HasForeignKey(m => m.ReceiverId)
        .OnDelete(DeleteBehavior.Restrict);
-        // Foreign key ilişkileri için silme davranışını sınırlayın
+        // Foreign key ilişkileri için silme davranışını sınırlamak
         foreach (var relationship in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
         {
             relationship.DeleteBehavior = DeleteBehavior.Restrict;
@@ -61,17 +67,7 @@ public class YummyAppDbContext : IdentityDbContext<ApplicationUser, ApplicationR
 
         // Fluent API konfigürasyonlarını uygulamak
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
-        // Business ve BusinessLocation arasındaki ilişkiyi belirle
-        //modelBuilder.Entity<Business>()
-        //.HasOne(b => b.Location)
-        //.WithOne(l => l.Business)
-        //.HasForeignKey<BusinessLocation>(l => l.Id);
-
-       // modelBuilder.Entity<Post>()
-       //.HasOne(p => p.PostLocation)
-       //.WithOne(pl => pl.Post)
-       //.HasForeignKey<Post>(p => p.PostLocationId)
-       //.IsRequired(false);
+       
     }
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
@@ -82,7 +78,7 @@ public class YummyAppDbContext : IdentityDbContext<ApplicationUser, ApplicationR
 
     private void SetAuditInformation()
     {
-        var entries = ChangeTracker.Entries<IAuditableEntity>().Where(x => x.State == EntityState.Added || x.State == EntityState.Modified);
+        var entries = ChangeTracker.Entries<IAuditableEntity<Guid>>().Where(x => x.State == EntityState.Added || x.State == EntityState.Modified);
 
         var userId = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "unknown";
 

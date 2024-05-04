@@ -7,7 +7,7 @@ using yummyApp.Domain.Common;
 namespace yummyApp.Application.Repositories
 {
     public interface IAsyncRepository<TEntity, TKey> : IQuery<TEntity>
-    where TEntity : BaseAuditableEntity<TKey>
+    where TEntity : IAuditableEntity<TKey>
     {
         Task<TEntity?> GetAsync(
             Expression<Func<TEntity, bool>> predicate,

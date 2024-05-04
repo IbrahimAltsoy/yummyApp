@@ -1,4 +1,5 @@
 ﻿using yummyApp.Domain.Common;
+using yummyApp.Domain.Identity;
 
 namespace yummyApp.Domain.Entities
 {
@@ -11,7 +12,7 @@ namespace yummyApp.Domain.Entities
         public Guid UserId { get; set; }
         public Guid BusinessId { get; set; }
 
-        public User User { get; set; }
+        public AppUser User { get; set; }
         public Business Business { get; set; }
     }
 }

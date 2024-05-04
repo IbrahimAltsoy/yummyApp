@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using yummyApp.Application.Features.Users.Commands.Create;
-using yummyApp.Domain.Entities;
+using yummyApp.Domain.Identity;
 
 namespace yummyApp.Application.Features.Users
 {
@@ -8,7 +8,7 @@ namespace yummyApp.Application.Features.Users
     {
         public MappingProfile() 
         {
-            CreateMap<User,CreateUserCommandRequest>().ReverseMap();
+            CreateMap<AppUser,CreateUserCommandRequest>().ReverseMap();
         }
     }
 }

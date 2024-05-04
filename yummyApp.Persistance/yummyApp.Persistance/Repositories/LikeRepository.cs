@@ -5,6 +5,7 @@ using yummyApp.Persistance.Context;
 using Azure.Core;
 using Microsoft.EntityFrameworkCore;
 using yummyApp.Application.Features.Likes.Queries.GetAll;
+using yummyApp.Domain.Identity;
 
 namespace yummyApp.Persistance.Repositories
 {
@@ -15,7 +16,7 @@ namespace yummyApp.Persistance.Repositories
             
         }
 
-        public async Task<List<User>> UsersWhoLikedAsync(Guid postId)
+        public async Task<List<AppUser>> UsersWhoLikedAsync(Guid postId)
         {
             var likes = await Context.Likes
             .Where(l => l.PostID == postId && l.DeletedAt == null)
@@ -23,7 +24,7 @@ namespace yummyApp.Persistance.Repositories
             .ToListAsync();
             var usersWhoLiked = await Context.Users
                 .Where(u => likes.Contains(u.Id))
-                .Select(u => new User
+                .Select(u => new AppUser
                 {
                     Name = u.Name,
                     Surname = u.Surname,

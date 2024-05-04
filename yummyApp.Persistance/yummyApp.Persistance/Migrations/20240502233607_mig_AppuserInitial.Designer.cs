@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace yummyApp.Persistance.Migrations
 {
     [DbContext(typeof(YummyAppDbContext))]
-    partial class YummyAppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240502233607_mig_AppuserInitial")]
+    partial class mig_AppuserInitial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -590,7 +593,7 @@ namespace yummyApp.Persistance.Migrations
                     b.Property<DateTime>("Timestamp")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 5, 3, 10, 34, 56, 144, DateTimeKind.Utc).AddTicks(6805));
+                        .HasDefaultValue(new DateTime(2024, 5, 2, 23, 36, 6, 702, DateTimeKind.Utc).AddTicks(6125));
 
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)");
@@ -845,14 +848,18 @@ namespace yummyApp.Persistance.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
-                    b.Property<string>("ActivationKey")
+                    b.Property<string>("ActivationCode")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("Birthday")
+                    b.Property<DateTime>("Birthday")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ConfirmPhone")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedAt")
@@ -877,7 +884,7 @@ namespace yummyApp.Persistance.Migrations
                     b.Property<int>("Gender")
                         .HasColumnType("int");
 
-                    b.Property<bool?>("IsActive")
+                    b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
                     b.Property<DateTime?>("LastModifiedAt")
@@ -908,6 +915,10 @@ namespace yummyApp.Persistance.Migrations
                     b.Property<string>("PasswordHash")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("nvarchar(max)");
 
@@ -915,12 +926,6 @@ namespace yummyApp.Persistance.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("RefreshToken")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("RefreshTokenEndDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Roles")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SecurityStamp")

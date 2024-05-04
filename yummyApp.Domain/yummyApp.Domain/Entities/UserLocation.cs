@@ -1,4 +1,5 @@
 ﻿using yummyApp.Domain.Common;
+using yummyApp.Domain.Identity;
 
 namespace yummyApp.Domain.Entities
 {
@@ -9,6 +10,6 @@ namespace yummyApp.Domain.Entities
         public double Latitude { get; set; }
         public double Longitude { get; set; }
         
-        public User User { get; set; }
+        public AppUser User { get; set; }
     }
 }

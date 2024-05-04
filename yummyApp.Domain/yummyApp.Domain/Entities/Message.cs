@@ -1,4 +1,5 @@
 ﻿using yummyApp.Domain.Common;
+using yummyApp.Domain.Identity;
 
 namespace yummyApp.Domain.Entities
 {
@@ -11,7 +12,7 @@ namespace yummyApp.Domain.Entities
         public Guid SenderId { get; set; }
         public Guid ReceiverId { get; set; }
 
-        public User Sender { get; set; }
-        public User Receiver { get; set; }
+        public AppUser Sender { get; set; }
+        public AppUser Receiver { get; set; }
     }
 }

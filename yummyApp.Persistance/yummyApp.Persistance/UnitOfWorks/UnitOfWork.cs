@@ -37,7 +37,7 @@ namespace yummyApp.Persistance.UnitOfWorks
         public ITagRepository TagRepository => _tagRepository ??= new TagRepository(_dbContext);
 
         private IUserRepository _userRepository;
-        public IUserRepository UserRepository => _userRepository ??= new UserRepository(_dbContext);
+        //public IUserRepository UserRepository => _userRepository ??= new UserRepository(_dbContext);
 
         public int Commit()
         {

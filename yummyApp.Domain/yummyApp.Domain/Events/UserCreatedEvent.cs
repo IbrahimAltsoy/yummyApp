@@ -1,11 +1,11 @@
 ﻿using yummyApp.Domain.Common;
-using yummyApp.Domain.Entities;
+using yummyApp.Domain.Identity;
 
 namespace yummyApp.Domain.Events
 {
     public class UserCreatedEvent:BaseEvent
     {
-        public User User { get; }
-        public UserCreatedEvent(User user) {  User = user; }
+        public AppUser User { get; }
+        public UserCreatedEvent(AppUser user) {  User = user; }
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace yummyApp.Domain.Common
 {
-    public abstract class BaseAuditableEntity<TKey>:BaseEntity<TKey>,IAuditableEntity
+    public abstract class BaseAuditableEntity<TKey>:BaseEntity<TKey>,IAuditableEntity<TKey>
     {
         public DateTime CreatedAt { get; set; }
 

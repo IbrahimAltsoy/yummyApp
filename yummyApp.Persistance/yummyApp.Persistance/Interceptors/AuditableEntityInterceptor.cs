@@ -36,7 +36,7 @@ namespace yummyApp.Persistance.Interceptors
         {
             if (context == null) return;
 
-            var entries = context.ChangeTracker.Entries<IAuditableEntity>();
+            var entries = context.ChangeTracker.Entries<IAuditableEntity<Guid>>();
 
             foreach (var entry in entries)
             {

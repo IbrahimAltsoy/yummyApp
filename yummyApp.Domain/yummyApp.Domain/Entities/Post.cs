@@ -1,9 +1,10 @@
 ﻿using yummyApp.Domain.Common;
 using yummyApp.Domain.Enums;
+using yummyApp.Domain.Identity;
 
 namespace yummyApp.Domain.Entities
 {
-    
+
     public class Post: BaseAuditableEntity<Guid>
     {
         public string? Title { get; set; }
@@ -18,7 +19,7 @@ namespace yummyApp.Domain.Entities
         public List<Media>? Media { get; set; }
         public List<Tag>? Tags { get; set; }
         public List<Like>? Likes { get; set; }
-        public User? User { get; set; }
+        public AppUser? User { get; set; }
         public Business? Business { get; set; }
     }
     

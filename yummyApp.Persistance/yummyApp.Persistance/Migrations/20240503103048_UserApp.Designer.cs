@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace yummyApp.Persistance.Migrations
 {
     [DbContext(typeof(YummyAppDbContext))]
-    partial class YummyAppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240503103048_UserApp")]
+    partial class UserApp
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -590,7 +593,7 @@ namespace yummyApp.Persistance.Migrations
                     b.Property<DateTime>("Timestamp")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 5, 3, 10, 34, 56, 144, DateTimeKind.Utc).AddTicks(6805));
+                        .HasDefaultValue(new DateTime(2024, 5, 3, 10, 30, 46, 667, DateTimeKind.Utc).AddTicks(5109));
 
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)");

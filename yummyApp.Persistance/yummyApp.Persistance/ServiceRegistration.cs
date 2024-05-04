@@ -3,9 +3,10 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using yummyApp.Application.Abstract.DbContext;
+using yummyApp.Application.Repositories;
 using yummyApp.Application.Repositories.Repository;
 using yummyApp.Application.UnitOfWork;
-using yummyApp.Infrastructure.Identity;
+using yummyApp.Domain.Identity;
 using yummyApp.Persistance.Context;
 using yummyApp.Persistance.Interceptors;
 using yummyApp.Persistance.Repositories;
@@ -25,8 +26,9 @@ namespace yummyApp.Persistance
             services.AddScoped<ILikeRepository, LikeRepository>();
             services.AddScoped<IPostRepository, PostRepository>();
             services.AddScoped<ITagRepository, TagRepository>();
-            services.AddScoped<IUserRepository, UserRepository>();
+            //services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IMediaRepository, MediaRepository>();
+
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddDbContext<YummyAppDbContext>((sp, options) =>

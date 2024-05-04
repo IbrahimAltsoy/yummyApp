@@ -1,4 +1,5 @@
 ﻿using yummyApp.Domain.Common;
+using yummyApp.Domain.Identity;
 
 namespace yummyApp.Domain.Entities
 {
@@ -9,7 +10,7 @@ namespace yummyApp.Domain.Entities
         public Guid? FolloweeID { get; set; }
         public bool FriendshipStatus { get; set; }
 
-        public User? Follower { get; set; }
-        public User? Followee { get; set; }
+        public AppUser? Follower { get; set; }
+        public AppUser? Followee { get; set; }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using yummyApp.Domain.Entities;
+using yummyApp.Domain.Identity;
 
 namespace yummyApp.Application.Abstract.DbContext
 {
@@ -13,7 +14,7 @@ namespace yummyApp.Application.Abstract.DbContext
         DbSet<Tag> Tags { get; }
         DbSet<BusinessLocation> BusinessLocations { get; }
         DbSet<PostLocation> PostLocations { get; }
-        DbSet<User> Users { get; }
+        DbSet<AppUser> AppUsers { get; }
 
 
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);

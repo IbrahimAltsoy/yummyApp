@@ -11,7 +11,7 @@ namespace yummyApp.Application.UnitOfWork
         IMediaRepository MediaRepository { get; }
         IPostRepository PostRepository { get; }
         ITagRepository TagRepository { get; }
-        IUserRepository UserRepository { get; }
+        //IUserRepository UserRepository { get; }
         int Commit();
 
         Task<int> CommitAsync();

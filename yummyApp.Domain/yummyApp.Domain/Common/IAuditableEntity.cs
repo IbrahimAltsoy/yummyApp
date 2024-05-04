@@ -1,6 +1,6 @@
 ﻿namespace yummyApp.Domain.Common
 {
-    public interface IAuditableEntity
+    public interface IAuditableEntity<TKey>:IEntity<TKey>
     {
         DateTime CreatedAt { get; set; }
 
