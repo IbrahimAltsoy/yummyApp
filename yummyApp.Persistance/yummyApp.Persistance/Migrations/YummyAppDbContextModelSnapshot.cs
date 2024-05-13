@@ -590,7 +590,7 @@ namespace yummyApp.Persistance.Migrations
                     b.Property<DateTime>("Timestamp")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 5, 3, 10, 34, 56, 144, DateTimeKind.Utc).AddTicks(6805));
+                        .HasDefaultValue(new DateTime(2024, 5, 13, 16, 29, 3, 296, DateTimeKind.Utc).AddTicks(8776));
 
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)");
@@ -845,6 +845,10 @@ namespace yummyApp.Persistance.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
+                    b.Property<string>("ActivationCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("ActivationKey")
                         .HasColumnType("nvarchar(max)");
 
@@ -868,8 +872,10 @@ namespace yummyApp.Persistance.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(50)");
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");

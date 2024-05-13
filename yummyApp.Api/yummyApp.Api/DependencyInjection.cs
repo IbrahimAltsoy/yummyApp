@@ -1,4 +1,7 @@
-﻿namespace yummyApp.Api
+﻿using yummyApp.Application.Abstract.Common;
+using yummyApp.Persistance.Authentication;
+
+namespace yummyApp.Api
 {
     public static class DependencyInjection
     {
@@ -7,6 +10,8 @@
             services.AddControllers();
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();
+            services.AddScoped<IUser, CurrentUser>();
+
             return services;
         }
     }

@@ -13,12 +13,16 @@ using yummyApp.Application.Abstract.DbContext;
 using yummyApp.Domain.Common;
 using yummyApp.Domain.Entities;
 using yummyApp.Domain.Identity;
+using yummyApp.Application.Services.Authencation;
+using yummyApp.Persistance.Context;
+using Microsoft.AspNetCore.Authentication;
+
 
 public class YummyAppDbContext : IdentityDbContext<AppUser, UserRole, Guid>, IYummyAppDbContext
 {
-    private readonly IHttpContextAccessor _httpContextAccessor;
-
-
+    public YummyAppDbContext(DbContextOptions<YummyAppDbContext> options) : base(options)
+    {
+    }
     public DbSet<Business> Businesses { get; set; }
     public DbSet<Comment> Comments { get; set; }
     public DbSet<Friendship> Friendships { get; set; }
@@ -33,13 +37,7 @@ public class YummyAppDbContext : IdentityDbContext<AppUser, UserRole, Guid>, IYu
 
    // public DbSet<User> Users { get; set; }
 
-    public YummyAppDbContext(DbContextOptions<YummyAppDbContext> options, IHttpContextAccessor httpContextAccessor) : base(options)
-    {
-        _httpContextAccessor = httpContextAccessor;
-    }
-
-
-
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -70,59 +68,6 @@ public class YummyAppDbContext : IdentityDbContext<AppUser, UserRole, Guid>, IYu
        
     }
 
-    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
-    {
-        SetAuditInformation();
-        return base.SaveChangesAsync(cancellationToken);
-    }
-
-    private void SetAuditInformation()
-    {
-        var entries = ChangeTracker.Entries<IAuditableEntity<Guid>>().Where(x => x.State == EntityState.Added || x.State == EntityState.Modified);
-
-        var userId = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "unknown";
-
-        foreach (var entry in entries)
-        {
-            if (entry.State == EntityState.Added)
-            {
-                //entry.Property("CreatedAt").CurrentValue = DateTime.UtcNow;
-                entry.Property("CreatedBy").CurrentValue = userId;
-            }
-            else if (entry.State == EntityState.Modified)
-            {
-                
-                if (entry.Property("DeletedAt").IsModified)
-                {
-                    entry.Property("DeletedBy").CurrentValue = userId;
-                }
-                else 
-                {
-                    entry.Property("LastModifiedBy").CurrentValue = userId;
-                }
-                
-            }
-            
-        }
-
-        
-    }
 }
 
-public class CurrentUserValueGenerator : ValueGenerator<string>
-{
-    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public CurrentUserValueGenerator(IHttpContextAccessor httpContextAccessor)
-    {
-        _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
-    }
-
-    public override bool GeneratesTemporaryValues => false;
-
-    public override string Next(EntityEntry entry)
-    {
-        var userId = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "unknown";
-        return userId;
-    }
-}

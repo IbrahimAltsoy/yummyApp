@@ -2,6 +2,9 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using yummyApp.Application.Features.Users.Commands.Create;
+using yummyApp.Application.Features.Users.Commands.Update;
+using yummyApp.Application.Features.Users.Queries.GetAll;
+using yummyApp.Application.Features.Users.Queries.GetUserById;
 
 namespace yummyApp.Api.Controllers
 {
@@ -15,11 +18,39 @@ namespace yummyApp.Api.Controllers
         {
             _mediator = mediator;
         }
+        [HttpGet]
+        public async Task<IActionResult> Get([FromQuery] GetAllUserQueryRequest request)
+        {
+            GetAllUserQueryResponse response = await _mediator.Send(request);
+            return Ok(response);
+
+        }
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById([FromQuery] GetUserByIdQueryRequest request)
+        {
+            GetUserByIdQueryResponse response = await _mediator.Send(request);
+            return Ok(response);
+        }
         [HttpPost]
         public async Task<IActionResult> Post(CreateUserCommandRequest request)
         {
             CreateUserCommandResponse response = await _mediator.Send(request);
             return Ok(response);
         }
+        [HttpPut]
+        public async Task<IActionResult> Update(UpdateUserCommandRequest request)
+        {
+            UpdateUserCommandResponse response = await _mediator.Send(request);
+
+            return Ok("Güncelleme başarılı bir şekilde yapılmıştır.");
+        }
+        //[HttpPost("update-password")]
+        //public async Task<IActionResult> UpdatePassword([FromBody] UpdatePasswordCommandRequest request)
+        //{
+        //    UpdatePasswordCommandResponse response = await _mediator.Send(request);
+        //    int a = 5;
+        //    return Ok(response);
+
+        //}
     }
 }
