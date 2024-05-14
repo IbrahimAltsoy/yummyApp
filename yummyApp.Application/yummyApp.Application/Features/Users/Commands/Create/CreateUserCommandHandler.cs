@@ -29,9 +29,12 @@ namespace yummyApp.Application.Features.Users.Commands.Create
                 Gender = request.Gender,
                 Birthday = request.Birthday,
                 IsActive = request.IsActive,
+                ActivationCode = request.ActivationCode,
                 Email = request.Email,
                 Password = request.Password,
-                PasswordConfirm = request.PasswordConfirm
+                PasswordConfirm = request.PasswordConfirm,
+                
+                
             });
             return new()
             {

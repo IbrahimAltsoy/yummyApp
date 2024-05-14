@@ -4,6 +4,6 @@
     {
         Task ResetPasswordAsync(string email);
         Task<bool> VerifyResetTokenAsync(string resetToken, string userId);
-        void GetCurrentUserNameAsync();
+       
     }
 }

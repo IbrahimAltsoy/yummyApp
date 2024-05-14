@@ -43,6 +43,7 @@ namespace yummyApp.Persistance.Services.Users
                 Birthday = userCreate.Birthday,
                 IsActive = userCreate.IsActive,
                 PhoneNumber = userCreate.PhoneNumber,
+                ActivationCode = userCreate.ActivationCode,
                 Email = userCreate.Email
 
             }, userCreate.Password);

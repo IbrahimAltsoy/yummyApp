@@ -53,8 +53,8 @@ namespace yummyApp.Persistance.Authentication
             }
 
             //await _signInManager.PasswordSignInAsync(user, request.Password, false, false);
-           // await _signInManager.SignInWithClaimsAsync(user, true, claims);
-            await _signInManager.SignInAsync(user,false);
+          //await _signInManager.SignInWithClaimsAsync(user, true, claims);
+           await _signInManager.SignInAsync(user,true);
             
 
             return new AuthenticationResponse

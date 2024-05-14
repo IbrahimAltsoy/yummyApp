@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using System;
 using yummyApp.Application.Abstract.Common;
 using yummyApp.Domain.Common;
+using yummyApp.Persistance.Services.Jwt;
 
 namespace yummyApp.Persistance.Interceptors
 {
@@ -11,11 +12,13 @@ namespace yummyApp.Persistance.Interceptors
     {
         readonly IUser _currentUser;
         readonly TimeProvider _dateTime;
+        
 
         public AuditableEntityInterceptor(IUser currentUser, TimeProvider dateTime)
         {
             _currentUser = currentUser;
             _dateTime = dateTime;
+           
         }
         public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)
         {
@@ -32,12 +35,12 @@ namespace yummyApp.Persistance.Interceptors
             return base.SavingChangesAsync(eventData, result, cancellationToken);
         }
 
-        private void UpdateEntities(DbContext context)
+        private async void UpdateEntities(DbContext context)
         {
             if (context == null) return;
 
             var entries = context.ChangeTracker.Entries<IAuditableEntity<Guid>>();
-
+            var userId = _currentUser.Id;
             foreach (var entry in entries)
             {
                 
@@ -47,12 +50,12 @@ namespace yummyApp.Persistance.Interceptors
                 if (entry.State == EntityState.Added)
                 {
                     entry.Property(o => o.CreatedAt).CurrentValue = _dateTime.GetUtcNow().DateTime;
-                    entry.Property(o => o.CreatedBy).CurrentValue = _currentUser.Id;
+                    entry.Property(o => o.CreatedBy).CurrentValue = userId;
                 }
                 else if (entry.State == EntityState.Modified || entry.HasChangedOwnedEntities())
                 {
                     entry.Property(o => o.LastModifiedAt).CurrentValue = _dateTime.GetUtcNow().DateTime;
-                    entry.Property(o => o.LastModifiedBy).CurrentValue = _currentUser.Id;
+                    entry.Property(o => o.LastModifiedBy).CurrentValue = userId;
                 }
                 else if (entry.State == EntityState.Deleted || (
                     entry.State == EntityState.Modified &&
@@ -60,7 +63,7 @@ namespace yummyApp.Persistance.Interceptors
                     entry.Property(o => o.DeletedAt).OriginalValue == null))
                 {
                     entry.Property(o => o.DeletedAt).CurrentValue = _dateTime.GetUtcNow().DateTime;
-                    entry.Property(o => o.DeletedBy).CurrentValue = _currentUser.Id;
+                    entry.Property(o => o.DeletedBy).CurrentValue = userId;
                     entry.State = EntityState.Modified;
                 }
             }

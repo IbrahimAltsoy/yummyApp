@@ -2,11 +2,17 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Text;
 using yummyApp.Application.Features.Users.Commands.GoogleLogin;
 using yummyApp.Application.Features.Users.Commands.PasswordReset;
 using yummyApp.Application.Features.Users.Commands.UserLogin;
 using yummyApp.Application.Features.Users.Commands.VerifyResetToken;
+using yummyApp.Application.Services.Account.Models;
+using yummyApp.Persistance.Authentication;
+using yummyApp.Persistance.Services.Jwt;
 
 namespace yummyApp.Api.Controllers
 {
@@ -14,52 +20,60 @@ namespace yummyApp.Api.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        readonly IMediator _mediator;
-        readonly IHttpContextAccessor _httpContextAccessor;
+         readonly JwtAccountService _accountService;
+         readonly IConfiguration _configuration;
 
-        public AuthController(IMediator mediator, IHttpContextAccessor httpContextAccessor)
+        public AuthController(JwtAccountService accountService, IConfiguration configuration)
         {
-            _mediator = mediator;
-            _httpContextAccessor = httpContextAccessor;
+            _accountService = accountService;
+            _configuration = configuration;
         }
-        [HttpPost("[action]")]
-        public async Task<IActionResult> Login(UserLoginCommandRequest request)
-        {
-            if (_httpContextAccessor.HttpContext != null)
-            {
-                // Kullanıcı bilgilerine erişim sağla burada eklemeler yapıldı 
-                var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                var userEmail = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.Email)?.Value;
 
-                // Diğer işlemleri gerçekleştir
-                UserLoginCommandResponse response = await _mediator.Send(request);
-                return Ok(response);
-            }
-            else
+        [AllowAnonymous]
+        [HttpPost("authenticate")]
+        public async Task<IActionResult> Authenticate(AuthenticationRequest request)
+        {
+            var authenticatedUserClaims = await _accountService.AuthenticateAsync(request);
+            if (authenticatedUserClaims == null) return Unauthorized();
+
+            //var expireInMinute = Convert.ToDouble(_configuration[]);
+            var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Token:SecurityKey"]));
+            var tokenOptions = new JwtSecurityToken(
+                issuer: _configuration["Token:Issuer"],
+                audience: _configuration["Token:Audience"],
+                claims: authenticatedUserClaims,
+                expires: DateTime.UtcNow.AddMinutes(50),
+                notBefore: DateTime.UtcNow,
+                signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256)
+            );
+            var accessToken = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
+            var refreshToken = AccountHelper.GenerateSalt();
+
+            return Ok(new
             {
-                // Kullanıcı kimliği doğrulanamadı veya HttpContext nesnesi yok
-                // Hata işleme veya uygun bir cevap döndürme
-                return Unauthorized();
-            }
+                AccessToken = accessToken,
+                RefreshToken = refreshToken,
+                ExpiresIn = TimeSpan.FromMinutes(50).TotalSeconds,
+            });
         }
-        [HttpPost("google-login")]
-        public async Task<IActionResult> GoogleLogin(GoogleLoginCommandRequest googleLoginCommandRequest)
-        {
-            GoogleLoginCommandResponse response = await _mediator.Send(googleLoginCommandRequest);
-            return Ok(response);
-        }
-        [HttpPost("password-reset")]
-        public async Task<IActionResult> PasswordReset([FromBody] PasswordResetCommandRequest request)
-        {
-            PasswordResetCommandResponse response = await _mediator.Send(request);
-            return Ok(response);
-        }
-        [HttpPost("verify-reset-token")]
-        public async Task<IActionResult> VerifyResetToken([FromBody] VerifyResetTokenCommandRequest request)
-        {
-            VerifyResetTokenCommandResponse response = await _mediator.Send(request);
-            return Ok(response);
-        }
+        //[HttpPost("google-login")]
+        //public async Task<IActionResult> GoogleLogin(GoogleLoginCommandRequest googleLoginCommandRequest)
+        //{
+        //    GoogleLoginCommandResponse response = await _mediator.Send(googleLoginCommandRequest);
+        //    return Ok(response);
+        //}
+        //[HttpPost("password-reset")]
+        //public async Task<IActionResult> PasswordReset([FromBody] PasswordResetCommandRequest request)
+        //{
+        //    PasswordResetCommandResponse response = await _mediator.Send(request);
+        //    return Ok(response);
+        //}
+        //[HttpPost("verify-reset-token")]
+        //public async Task<IActionResult> VerifyResetToken([FromBody] VerifyResetTokenCommandRequest request)
+        //{
+        //    VerifyResetTokenCommandResponse response = await _mediator.Send(request);
+        //    return Ok(response);
+        //}
 
     }
 }

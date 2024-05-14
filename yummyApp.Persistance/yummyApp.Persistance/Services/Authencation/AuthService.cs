@@ -31,6 +31,7 @@ namespace yummyApp.Persistance.Services.Authencation
         readonly IUserService _userService;
         readonly IEmailService _emailService;
         readonly IHttpContextAccessor _httpContextAccessor;
+       
 
         public AuthService(HttpClient httpClient, UserManager<AppUser> userManager, ITokenHandler tokenHandler, IConfiguration configuration, SignInManager<AppUser> signInManager, IUserService userService, IEmailService emailService, IHttpContextAccessor httpContextAccessor)
         {
@@ -42,6 +43,7 @@ namespace yummyApp.Persistance.Services.Authencation
             _userService = userService;
             _emailService = emailService;
             _httpContextAccessor = httpContextAccessor;
+           
         }
         public async Task<Token> LoginAsync(string userNameOrEmail, string password, int accessTokenLifeTime)
         {
@@ -57,9 +59,7 @@ namespace yummyApp.Persistance.Services.Authencation
 
                 Token token = _tokenHandler.CreateAccessToken(accessTokenLifeTime, user);
                 await _userService.UpdateRefreshToken(token.RefreshToken, user, token.Expiration, 5 * 60);
-                // aşağıdaki kod bloğu _httpContextAccessor un çalışığ çalışmadığını test etmek için bıraktım buraya hem userId hem de userEmail buraya eklemeler yapıldı
-                var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                var userEmail = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.Email)?.Value;
+                
                 return token;
 
             }
@@ -151,13 +151,6 @@ namespace yummyApp.Persistance.Services.Authencation
 
         }
 
-        public void GetCurrentUserNameAsync()
-        {
-            //AppUser? appUser = await _userManager.FindByIdAsync(userId.ToString());
-            //var appUser = await _userManager.FindByNameAsync(user.Name);
-            
-            int a = 5;
-          
-        }
+        
     }
 }

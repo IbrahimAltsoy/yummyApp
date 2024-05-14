@@ -42,7 +42,7 @@ namespace yummyApp.Persistance
             });
             services.AddScoped<IYummyAppDbContext>(provider => provider.GetRequiredService<YummyAppDbContext>());
             services.AddSingleton(TimeProvider.System);
-
+           
             services.AddIdentity<AppUser, UserRole>(options =>
             {
                 options.Password.RequiredLength = 3;
