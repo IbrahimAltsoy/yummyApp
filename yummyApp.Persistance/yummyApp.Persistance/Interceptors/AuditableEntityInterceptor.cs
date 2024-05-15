@@ -7,7 +7,7 @@ using yummyApp.Domain.Common;
 using yummyApp.Persistance.Services.Jwt;
 
 namespace yummyApp.Persistance.Interceptors
-{// Belli düzenlemeler yapman lazım
+{// Belli düzenlemeler yapman lazımm
     public class AuditableEntityInterceptor: SaveChangesInterceptor
     {
         readonly IUser _currentUser;
