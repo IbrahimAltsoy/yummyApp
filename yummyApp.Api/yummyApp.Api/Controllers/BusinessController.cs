@@ -19,7 +19,7 @@ namespace yummyApp.Api.Controllers
         public BusinessController(IMediator mediator)
         {
             _mediator = mediator;
-        }
+        }//Düzenleme yapıldı
         [HttpGet]
         public async Task<IActionResult> Get([FromQuery]GetAllBusinessQueryRequest request)
         {
