@@ -19,7 +19,7 @@ namespace yummyApp.Api.Controllers
         public BusinessController(IMediator mediator)
         {
             _mediator = mediator;
-        }//Düzenleme yapıldı
+        }
         [HttpGet]
         public async Task<IActionResult> Get([FromQuery]GetAllBusinessQueryRequest request)
         {
@@ -43,8 +43,7 @@ namespace yummyApp.Api.Controllers
         {
             if (id == request.Id)
             {
-                var response = await _mediator.Send(request);
-                int a = 4;
+                var response = await _mediator.Send(request);             
                 return Ok(response);
             }
             else return Ok(false);

@@ -1,4 +1,5 @@
-﻿using yummyApp.Application.Abstract.Common;
+﻿using yummyApp.Api.Infrastructure;
+using yummyApp.Application.Abstract.Common;
 using yummyApp.Persistance.Authentication;
 using yummyApp.Persistance.Services.Jwt;
 
@@ -13,8 +14,9 @@ namespace yummyApp.Api
             services.AddSwaggerGen(); 
             //services.AddHttpContextAccessor();
             services.AddScoped<IUser, CurrentUser>();
-            
-            //services.AddExceptionHandler<GlobalExceptionHandler>();
+            services.AddExceptionHandler<GlobalExceptionHandler>();
+
+           
             services.AddScoped<JwtAccountService>();
 
             return services;
