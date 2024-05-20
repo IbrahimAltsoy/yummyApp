@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using MediatR;
+using yummyApp.Application.Repositories;
 using yummyApp.Application.Repositories.Repository;
+using yummyApp.Domain.Entities;
 
 namespace yummyApp.Application.Features.Tags.Commands.Update
 {
@@ -17,9 +19,7 @@ namespace yummyApp.Application.Features.Tags.Commands.Update
 
         public async Task<UpdateTagCommandResponse> Handle(UpdateTagCommandRequest request, CancellationToken cancellationToken)
         {
-           var data = await _tagRepository.GetAsync(x=>x.Id == request.Id);
-            data.BusinessID = request.BusinessID;
-            data.PostID = request.PostID;
+            var data = _mapper.Map<Tag>(request);
             await _tagRepository.UpdateAsync(data);
             return new();
         }
