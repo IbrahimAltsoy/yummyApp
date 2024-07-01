@@ -66,13 +66,20 @@ var app = builder.Build();
 Log.Information("Starting application...");
 
 // Configure the HTTP request pipeline.
+app.UseSwagger();
+app.UseSwaggerUI();
+
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-
-    await app.InitializeDb();
+    await app.InitializeDb();  // Veritabaný baþlatma iþlemini sadece geliþtirme ortamýnda yapýn
 }
+//if (app.Environment.IsDevelopment())
+//{
+//    app.UseSwagger();
+//    app.UseSwaggerUI();
+
+//    await app.InitializeDb();
+//}
 
 app.UseExceptionHandler(_ => { });
 app.UseHttpsRedirection();
