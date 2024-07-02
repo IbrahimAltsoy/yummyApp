@@ -1,16 +1,16 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using Serilog;
-using System.Security.Claims;
-using System.Text;
+using yummyApp.Persistance;
+using yummyApp.Infrastructure;
+using Swashbuckle.AspNetCore.SwaggerUI;
+using yummyApp.Persistance.Context;
 using yummyApp.Api;
 using yummyApp.Application;
-using yummyApp.Infrastructure;
-using yummyApp.Persistance;
-using yummyApp.Persistance.Context;
-using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
+using System.Text;
+using Serilog;
 
-#region Serilog Configuration
+#region
 Log.Logger = new LoggerConfiguration()
     .Enrich.FromLogContext()
     .MinimumLevel.Warning()
@@ -26,10 +26,8 @@ Log.Logger = new LoggerConfiguration()
         restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Warning)
     .CreateLogger();
 #endregion
-
 var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseSerilog();
-
 // Add services to the container.
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllers();
@@ -39,18 +37,14 @@ builder.Services.AddInfrastructureServices();
 builder.Services.AddHttpClient();
 builder.Services.AddWebApiServices(builder.Configuration);
 
-// Configure Swagger/OpenAPI
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "YummyApp API", Version = "v1" });
-});
 
-// Configure JWT Authentication
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+//builder.Services.AddEndpointsApiExplorer();
+//builder.Services.AddSwaggerGen();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer("Admin", options =>
     {
-        options.TokenValidationParameters = new TokenValidationParameters
+        options.TokenValidationParameters = new()
         {
             ValidateAudience = true,
             ValidateIssuer = true,
@@ -61,8 +55,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Token:SecurityKey"])),
             LifetimeValidator = (notBefore, expires, securityToken, validationParameters) => expires != null ? expires > DateTime.UtcNow : false,
             NameClaimType = ClaimTypes.NameIdentifier,
+
+
         };
     });
+
 
 var app = builder.Build();
 
@@ -71,28 +68,19 @@ Log.Information("Starting application...");
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseDeveloperExceptionPage();
-    await app.InitializeDb(); // Veritabaný baþlatma iþlemini sadece geliþtirme ortamýnda yapýn
+    app.UseSwagger();
+    app.UseSwaggerUI();
+
+    await app.InitializeDb();
 }
 
-app.UseExceptionHandler("/Home/Error");
+app.UseExceptionHandler(_ => { });
 app.UseHttpsRedirection();
-app.UseStaticFiles(); // Eðer statik dosya kullanýyorsanýz
-app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Enable middleware to serve generated Swagger as a JSON endpoint.
-app.UseSwagger();
-// Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
-// specifying the Swagger JSON endpoint.
-app.UseSwaggerUI(c =>
-{
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "YummyApp API V1");
-    c.RoutePrefix = string.Empty; // Swagger arayüzüne kök URL üzerinden eriþim saðlar
-});
-
 app.MapControllers();
-app.MapFallbackToFile("/app/index.html"); // Eðer SPA uygulamanýz varsa
+app.MapFallbackToFile("/app/index.html");
+
 
 app.Run();
