@@ -13,7 +13,9 @@ using yummyApp.Application.Exceptions.AuthExceptions;
 using yummyApp.Application.Features.Users.Commands.Create;
 using yummyApp.Application.Helpers;
 using yummyApp.Application.Paging;
+using yummyApp.Application.Services.Email;
 using yummyApp.Application.Services.Users;
+using yummyApp.Application.Tokens;
 using yummyApp.Domain.Identity;
 
 namespace yummyApp.Persistance.Services.Users
@@ -23,16 +25,21 @@ namespace yummyApp.Persistance.Services.Users
         readonly UserManager<AppUser> _userManager;
         readonly IMapper _mapper;
         readonly IYummyAppDbContext _dbContext;
+        readonly ITokenHandler _tokenHandler;
+        readonly IEmailService _emailService;
 
-        public UserService(UserManager<AppUser> userManager, IMapper mapper, IYummyAppDbContext dbContext)
+        public UserService(UserManager<AppUser> userManager, IMapper mapper, IYummyAppDbContext dbContext, ITokenHandler tokenHandler, IEmailService emailService)
         {
             _userManager = userManager;
             _mapper = mapper;
             _dbContext = dbContext;
+            _tokenHandler = tokenHandler;
+            _emailService = emailService;
         }
 
         public async Task<CreateUserCommandResponse> CreateUserAsync(UserCreateDto userCreate)
         {
+            string? activeCode =  _tokenHandler.CreateRefreshToken();
             IdentityResult result = await _userManager.CreateAsync(new()
             {
                 //Id = new(),
@@ -41,15 +48,27 @@ namespace yummyApp.Persistance.Services.Users
                 UserName = userCreate.UserName,
                 Gender = userCreate.Gender,
                 Birthday = userCreate.Birthday,
-                IsActive = userCreate.IsActive,
+                IsActive = false,
                 PhoneNumber = userCreate.PhoneNumber,
-                ActivationCode = userCreate.ActivationCode,
+                ActivationCode = activeCode,
                 Email = userCreate.Email
 
             }, userCreate.Password);
             CreateUserCommandResponse response = new() { Succeeded = result.Succeeded };
             if (result.Succeeded)
+            {
+                
+                string encodedEmail = Uri.EscapeDataString(userCreate.Email);
+                string encodedActivationCode = Uri.EscapeDataString(activeCode);
+                string activationLink = $"https://localhost:7009/api/Auth/verify-email?Email={encodedEmail}&ActivationCode={encodedActivationCode}";
+                await _emailService.SendMailAsync(
+                    userCreate.Email,
+                    "Aktivasyon Kodu",
+                    $"Kaydınızı doğrulamak için aşağıdaki bağlantıya tıklayınız: <a href='{activationLink}'>Aktivasyon Linki</a>"
+                );
+
                 response.Message = "Yeni kullanıcı kaydı başarılı bir şekilde gerçekleşti.";
+            }       
             else
             {
                 foreach (var error in result.Errors)
@@ -59,7 +78,7 @@ namespace yummyApp.Persistance.Services.Users
             }
             return response;
         }
-
+        
         public async Task<List<UserReadDto>> GetUserAllAsync()
         {
             List<AppUser> users =  _dbContext.AppUsers.ToList();

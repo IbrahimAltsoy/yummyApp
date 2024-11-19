@@ -9,6 +9,7 @@ using System.Text;
 using yummyApp.Application.Features.Users.Commands.GoogleLogin;
 using yummyApp.Application.Features.Users.Commands.PasswordReset;
 using yummyApp.Application.Features.Users.Commands.UserLogin;
+using yummyApp.Application.Features.Users.Commands.VerifyEmail;
 using yummyApp.Application.Features.Users.Commands.VerifyResetToken;
 using yummyApp.Application.Services.Account.Models;
 using yummyApp.Persistance.Authentication;
@@ -22,11 +23,16 @@ namespace yummyApp.Api.Controllers
     {
          readonly JwtAccountService _accountService;
          readonly IConfiguration _configuration;
+        readonly IMediator _mediator;
 
-        public AuthController(JwtAccountService accountService, IConfiguration configuration)
+
+
+
+        public AuthController(JwtAccountService accountService, IConfiguration configuration, IMediator mediator)
         {
             _accountService = accountService;
             _configuration = configuration;
+            _mediator = mediator;
         }
 
         [AllowAnonymous]
@@ -55,6 +61,13 @@ namespace yummyApp.Api.Controllers
                 RefreshToken = refreshToken,
                 ExpiresIn = TimeSpan.FromMinutes(50).TotalSeconds,
             });
+        }
+        [AllowAnonymous]
+        [HttpGet("verify-email")]
+        public async Task<IActionResult> VerifyEmail([FromQuery] VerifyEmailCommandRequest request )
+        {
+            VerifyEmailCommandResponse response = await _mediator.Send(request);
+           return Ok(response);
         }
         //[HttpPost("google-login")]
         //public async Task<IActionResult> GoogleLogin(GoogleLoginCommandRequest googleLoginCommandRequest)

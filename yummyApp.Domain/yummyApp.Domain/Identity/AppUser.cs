@@ -16,7 +16,7 @@ namespace yummyApp.Domain.Identity
         public DateTime? Birthday { get; set; }
         public bool? IsActive { get; set; }
         public Gender? Gender { get; set; }
-        public string ActivationCode { get; set; }
+        public string? ActivationCode { get; set; }
         
 
         public ICollection<UserRating> Ratings { get; set; }

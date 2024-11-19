@@ -13,8 +13,8 @@ namespace yummyApp.Application.Features.Users.Commands.Create
         public string PhoneNumber { get; set; }
         public DateTime? Birthday { get; set; }
         public Gender Gender { get; set; }
-        public bool? IsActive { get; set; }
-        public string ActivationCode { get; set; }
+        //public bool? IsActive { get; set; }
+        //public string ActivationCode { get; set; }
         public string Password { get; set; }
         public string PasswordConfirm { get; set; }
     }

@@ -85,7 +85,7 @@ namespace yummyApp.Persistance.Authentication
                 Name = request.FirstName,
                 Surname = request.LastName,
                 EmailConfirmed = false,
-                ActivationCode = activationCode
+                
             };
 
             if (request.IsExternalAuthentication)

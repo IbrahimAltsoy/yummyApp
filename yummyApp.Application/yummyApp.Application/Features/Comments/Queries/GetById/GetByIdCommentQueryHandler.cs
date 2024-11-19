@@ -22,10 +22,7 @@ namespace yummyApp.Application.Features.Comments.Queries.GetById
             //var data = await _commentRepository.GetAsync(x=>x.Id==request.Id);
             var data = await _commentRepository.GetAsync(x => x.Id == request.Id,
     include: q => q.Include(c => c.User).Include(c => c.Post));
-
-
             var mappedData = _mapper.Map<GetByIdCommentQueryResponse>(data);
-           
             return mappedData;
            
         }

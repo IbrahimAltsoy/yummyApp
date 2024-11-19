@@ -64,6 +64,7 @@ namespace yummyApp.Persistance
             services.AddScoped<ILikeRepository, LikeRepository>();
             services.AddScoped<IPostRepository, PostRepository>();
             services.AddScoped<ITagRepository, TagRepository>();
+           
 
             services.AddScoped<IUserService, UserService>();            
             services.AddScoped<IAuthService, AuthService>();            

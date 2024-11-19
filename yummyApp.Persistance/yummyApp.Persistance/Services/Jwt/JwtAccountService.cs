@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using yummyApp.Application.Abstract.Common;
+using yummyApp.Application.Exceptions.AuthExceptions;
 using yummyApp.Application.Services.Account.Models;
 using yummyApp.Domain.Identity;
 
@@ -29,10 +31,10 @@ namespace yummyApp.Persistance.Services.Jwt
         {
             
             var user = await _userManager.Users.FirstOrDefaultAsync(e => e.Email == request.Email);
-            if (user == null) return null;
-
+            if (user.IsActive == false) return null;
+            if (user == null) return null;           
             var checkPassword = await _signInManager.CheckPasswordSignInAsync(user, request.Password.Trim(), false);
-            if (!checkPassword.Succeeded) return null;
+            if (!checkPassword.Succeeded) return null;            
             var claims = await GetUserClaims(user);
             var identity = new ClaimsIdentity(claims, "jwt");
             var principal = new ClaimsPrincipal(identity);
