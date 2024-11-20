@@ -40,7 +40,7 @@ namespace yummyApp.Persistance.Services.Users
         public async Task<CreateUserCommandResponse> CreateUserAsync(UserCreateDto userCreate)
         {
             string? activeCode =  _tokenHandler.CreateRefreshToken();
-            IdentityResult result = await _userManager.CreateAsync(new()
+            AppUser? user = new AppUser
             {
                 //Id = new(),
                 Name = userCreate.Name,
@@ -53,7 +53,9 @@ namespace yummyApp.Persistance.Services.Users
                 ActivationCode = activeCode,
                 Email = userCreate.Email
 
-            }, userCreate.Password);
+            };
+            IdentityResult result = await _userManager.CreateAsync(user, userCreate.Password);
+           
             CreateUserCommandResponse response = new() { Succeeded = result.Succeeded };
             if (result.Succeeded)
             {
@@ -66,7 +68,7 @@ namespace yummyApp.Persistance.Services.Users
                     "Aktivasyon Kodu",
                     $"Kaydınızı doğrulamak için aşağıdaki bağlantıya tıklayınız: <a href='{activationLink}'>Aktivasyon Linki</a>"
                 );
-
+            await _userManager.AddToRoleAsync(user, "TemporaryUser");
                 response.Message = "Yeni kullanıcı kaydı başarılı bir şekilde gerçekleşti.";
             }       
             else

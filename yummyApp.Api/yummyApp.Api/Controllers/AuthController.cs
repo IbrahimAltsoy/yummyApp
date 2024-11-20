@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -23,18 +24,15 @@ namespace yummyApp.Api.Controllers
     {
          readonly JwtAccountService _accountService;
          readonly IConfiguration _configuration;
-        readonly IMediator _mediator;
-
-
-
+         readonly IMediator _mediator;
 
         public AuthController(JwtAccountService accountService, IConfiguration configuration, IMediator mediator)
         {
             _accountService = accountService;
             _configuration = configuration;
-            _mediator = mediator;
+            _mediator = mediator;            
         }
-
+       
         [AllowAnonymous]
         [HttpPost("authenticate")]
         public async Task<IActionResult> Authenticate(AuthenticationRequest request)
