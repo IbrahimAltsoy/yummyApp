@@ -31,6 +31,7 @@ namespace yummyApp.Persistance.Services.Jwt
         {
             
             var user = await _userManager.Users.FirstOrDefaultAsync(e => e.Email == request.Email);
+            if (user == null) { return null; }
             if (user.IsActive == false) return null;
             if (user == null) return null;           
             var checkPassword = await _signInManager.CheckPasswordSignInAsync(user, request.Password.Trim(), false);

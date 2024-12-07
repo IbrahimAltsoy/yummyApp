@@ -28,6 +28,7 @@ Log.Logger = new LoggerConfiguration()
 #endregion
 
 var builder = WebApplication.CreateBuilder(args);
+builder.WebHost.UseUrls("http://0.0.0.0:7009"); // burası mobilden giriş yapabilmek için eklendi.
 builder.Host.UseSerilog();
 
 // Add services to the container.
@@ -38,7 +39,16 @@ builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices();
 builder.Services.AddHttpClient();
 builder.Services.AddWebApiServices(builder.Configuration);
-
+//Cqrs politikası 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", builder =>
+    {
+        builder.AllowAnyOrigin()
+               .AllowAnyMethod()
+               .AllowAnyHeader();
+    });
+});
 // Configure Swagger/OpenAPI
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -76,9 +86,11 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseExceptionHandler("/Home/Error");
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection(); // burasının kapanma sebebi mobilden gelen istekleri kabul etsin diye kapatıldı.
 app.UseStaticFiles(); // Eðer statik dosya kullanýyorsanýz
 app.UseRouting();
+// CORS politikasını uygula
+app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
 
