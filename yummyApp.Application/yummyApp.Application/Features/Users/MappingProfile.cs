@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using yummyApp.Application.Dtos.Users;
 using yummyApp.Application.Features.Users.Commands.Create;
+using yummyApp.Application.Features.Users.Commands.Register;
 using yummyApp.Domain.Identity;
 
 namespace yummyApp.Application.Features.Users
@@ -13,6 +14,7 @@ namespace yummyApp.Application.Features.Users
             CreateMap<AppUser, UserCreateDto>().ReverseMap();
             CreateMap<AppUser,UserUpdateDto>().ReverseMap();
             CreateMap<AppUser, UserReadDto>().ReverseMap();
+            CreateMap<AppUser, RegisterCommandRequest>().ReverseMap();
         }
     }
 }

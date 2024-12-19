@@ -9,6 +9,7 @@ using System.Security.Claims;
 using System.Text;
 using yummyApp.Application.Features.Users.Commands.GoogleLogin;
 using yummyApp.Application.Features.Users.Commands.PasswordReset;
+using yummyApp.Application.Features.Users.Commands.Register;
 using yummyApp.Application.Features.Users.Commands.UserLogin;
 using yummyApp.Application.Features.Users.Commands.VerifyEmail;
 using yummyApp.Application.Features.Users.Commands.VerifyResetToken;
@@ -66,6 +67,19 @@ namespace yummyApp.Api.Controllers
         {
             VerifyEmailCommandResponse response = await _mediator.Send(request);
            return Ok(response);
+        }
+        [AllowAnonymous]
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] UserLoginCommandRequest request)
+        {
+            UserLoginCommandResponse response = await _mediator.Send(request);
+            return Ok(response);
+        }   
+        [HttpPost("register")]
+        public async Task<IActionResult> Register(RegisterCommandRequest request)
+        {
+            RegisterCommandResponse response = await _mediator.Send(request);
+            return Ok(response);
         }
         //[HttpPost("google-login")]
         //public async Task<IActionResult> GoogleLogin(GoogleLoginCommandRequest googleLoginCommandRequest)

@@ -15,6 +15,8 @@ using yummyApp.Domain.Identity;
 using yummyApp.Application.Exceptions.AuthExceptions;
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
+using yummyApp.Application.Features.Users.Commands.Register;
+using yummyApp.Application.Abstract.DbContext;
 
 
 
@@ -31,9 +33,10 @@ namespace yummyApp.Persistance.Services.Authencation
         readonly IUserService _userService;
         readonly IEmailService _emailService;
         readonly IHttpContextAccessor _httpContextAccessor;
+        readonly IYummyAppDbContext _yummyAppDbContext;
        
 
-        public AuthService(HttpClient httpClient, UserManager<AppUser> userManager, ITokenHandler tokenHandler, IConfiguration configuration, SignInManager<AppUser> signInManager, IUserService userService, IEmailService emailService, IHttpContextAccessor httpContextAccessor)
+        public AuthService(HttpClient httpClient, UserManager<AppUser> userManager, ITokenHandler tokenHandler, IConfiguration configuration, SignInManager<AppUser> signInManager, IUserService userService, IEmailService emailService, IHttpContextAccessor httpContextAccessor, IYummyAppDbContext yummyAppDbContext)
         {
             _httpClient = httpClient;
             _userManager = userManager;
@@ -43,6 +46,7 @@ namespace yummyApp.Persistance.Services.Authencation
             _userService = userService;
             _emailService = emailService;
             _httpContextAccessor = httpContextAccessor;
+            _yummyAppDbContext = yummyAppDbContext;
            
         }
         public async Task<Token> LoginAsync(string userNameOrEmail, string password, int accessTokenLifeTime)
@@ -151,6 +155,51 @@ namespace yummyApp.Persistance.Services.Authencation
 
         }
 
-        
+        public async Task<RegisterCommandResponse> RegisterAsync(RegisterCommandRequest request)
+        {
+           AppUser? appUser = await _userManager.FindByEmailAsync(request.Email);
+            if (appUser == null)
+            {
+                string? activeCode = _tokenHandler.CreateRefreshToken();
+                AppUser? user = new AppUser
+                {
+                    Name = request.Name,
+                    Surname = request.Surname,
+                    UserName = request.Email,
+                    IsActive = false,
+                    ActivationCode = activeCode,
+                    Email = request.Email
+                };   
+                
+                IdentityResult result = await _userManager.CreateAsync(user, request.Password);
+
+                RegisterCommandResponse response = new() { Success = result.Succeeded };
+                if (response.Success)
+                {
+
+                    string encodedEmail = Uri.EscapeDataString(request.Email);
+                    string encodedActivationCode = Uri.EscapeDataString(activeCode);
+                    string activationLink = $"https://localhost:7009/api/Auth/verify-email?Email={encodedEmail}&ActivationCode={encodedActivationCode}";
+                    await _emailService.SendMailAsync(
+                        request.Email,
+                        "Aktivasyon Kodu",
+                        $"Kaydınızı doğrulamak için aşağıdaki bağlantıya tıklayınız: <a href='{activationLink}'>Aktivasyon Linki</a>"
+                    );
+                    await _userManager.AddToRoleAsync(user, "TemporaryUser");
+                    response.Message = "Lütfen Email doğrulayınız!";
+                }
+                else
+                {
+                    foreach (var error in result.Errors)
+                    {
+                        response.Message += $"{error.Description} - {error.Code}<br>";
+                    }
+                }
+                return response;
+
+            }
+            else return null;
+
+        }
     }
 }

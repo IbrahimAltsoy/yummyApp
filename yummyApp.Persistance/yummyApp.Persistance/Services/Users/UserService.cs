@@ -53,7 +53,7 @@ namespace yummyApp.Persistance.Services.Users
                 ActivationCode = activeCode,
                 Email = userCreate.Email
 
-            };
+            };            
             IdentityResult result = await _userManager.CreateAsync(user, userCreate.Password);
            
             CreateUserCommandResponse response = new() { Succeeded = result.Succeeded };

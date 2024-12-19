@@ -19,7 +19,7 @@ namespace yummyApp.Persistance.Configurations
                .IsUnicode(false)
                .HasColumnType("varchar(50)")
                .IsRequired();
-            builder.Property(x => x.Gender).IsRequired();
+            //builder.Property(x => x.Gender).IsRequired();
            
 
 
