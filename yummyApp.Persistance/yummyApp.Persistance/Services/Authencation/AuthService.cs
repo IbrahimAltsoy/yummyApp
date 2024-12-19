@@ -157,9 +157,8 @@ namespace yummyApp.Persistance.Services.Authencation
 
         public async Task<RegisterCommandResponse> RegisterAsync(RegisterCommandRequest request)
         {
-           AppUser? appUser = await _userManager.FindByEmailAsync(request.Email);
-            if (appUser == null)
-            {
+          
+           
                 string? activeCode = _tokenHandler.CreateRefreshToken();
                 AppUser? user = new AppUser
                 {
@@ -196,9 +195,6 @@ namespace yummyApp.Persistance.Services.Authencation
                     }
                 }
                 return response;
-
-            }
-            else return null;
 
         }
     }
