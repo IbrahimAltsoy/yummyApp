@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using yummyApp.Application.Services.GoogleApi;
 using yummyApp.Domain.Identity;
 
 namespace yummyApp.Api.Controllers
@@ -11,10 +12,20 @@ namespace yummyApp.Api.Controllers
     public class TestController : ControllerBase
     {
          readonly RoleManager<UserRole> _roleManager;
+        readonly IGooglePlacesService _googlePlacesService;
 
-        public TestController(RoleManager<UserRole> roleManager)
+        public TestController(RoleManager<UserRole> roleManager, IGooglePlacesService googlePlacesService)
         {
             _roleManager = roleManager;
+            _googlePlacesService = googlePlacesService;
+        }
+        [AllowAnonymous]
+        [HttpGet("get-nearby-places")]
+        public async Task<IActionResult> GetNearbyPlaces(double latitude, double longitude)
+        {
+            var places = await _googlePlacesService.GetNearbyPlaces(latitude, longitude);
+
+            return Ok(places.Results);
         }
         [AllowAnonymous]
         [HttpPost("addRoles")]

@@ -1,6 +1,8 @@
 ﻿using yummyApp.Api.Infrastructure;
 using yummyApp.Application.Abstract.Common;
+using yummyApp.Application.Services.GoogleApi;
 using yummyApp.Persistance.Authentication;
+using yummyApp.Persistance.Services.GoogleApi;
 using yummyApp.Persistance.Services.Jwt;
 
 namespace yummyApp.Api
@@ -16,8 +18,10 @@ namespace yummyApp.Api
             services.AddScoped<IUser, CurrentUser>();
             services.AddExceptionHandler<GlobalExceptionHandler>();
 
-           
+            
             services.AddScoped<JwtAccountService>();
+
+            services.AddScoped<IGooglePlacesService, GooglePlacesService>();
 
             return services;
         }

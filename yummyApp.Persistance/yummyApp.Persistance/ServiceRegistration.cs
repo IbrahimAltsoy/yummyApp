@@ -12,6 +12,7 @@ using yummyApp.Application.Services.Account;
 using yummyApp.Application.Services.Account.Email;
 using yummyApp.Application.Services.Authencation;
 using yummyApp.Application.Services.Email;
+using yummyApp.Application.Services.GoogleApi;
 using yummyApp.Application.Services.Logger;
 using yummyApp.Application.Services.Users;
 using yummyApp.Application.UnitOfWork;
@@ -23,6 +24,7 @@ using yummyApp.Persistance.Interceptors;
 using yummyApp.Persistance.Repositories;
 using yummyApp.Persistance.Services.Authencation;
 using yummyApp.Persistance.Services.Email;
+using yummyApp.Persistance.Services.GoogleApi;
 using yummyApp.Persistance.Services.Logging;
 using yummyApp.Persistance.Services.Users;
 using yummyApp.Persistance.UnitOfWorks;
@@ -75,7 +77,7 @@ namespace yummyApp.Persistance
             services.AddScoped<IEmailService, EmailService>();
             //services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IMediaRepository, MediaRepository>();
-
+           
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddSingleton<IAppLogger, LogManager>();
