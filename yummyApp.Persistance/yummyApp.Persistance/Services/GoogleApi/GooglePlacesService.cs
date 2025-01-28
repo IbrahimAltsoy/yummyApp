@@ -18,7 +18,7 @@ namespace yummyApp.Persistance.Services.GoogleApi
             _httpClient = new HttpClient();
         }
 
-        public async Task<PlaceSearchResult> GetNearbyPlaces(double latitude, double longitude, int radius = 1500)
+        public async Task<PlaceSearchResult> GetNearbyPlacesAsync(double latitude, double longitude, int radius = 15000)
         {
 
             // https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=38,4192,27,1287&radius=150000&key=AIzaSyDXEKGz7AjjAsE959dnItLbfmCju2v5LDU
@@ -35,7 +35,15 @@ namespace yummyApp.Persistance.Services.GoogleApi
                 {
                     var json = await response.Content.ReadAsStringAsync();
                     var places = JsonConvert.DeserializeObject<PlaceSearchResult>(json);
-                    return places;
+                    Parallel.ForEach(places.Results, place =>
+                    {
+                        var firstPhoto = place.Photos?.FirstOrDefault();
+                        place.PhotoUrl = firstPhoto!= null
+                            ? $"https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference={firstPhoto.Photo_Reference}&key={_apiKey}"
+                            : null;
+                    });
+
+                    return places!;
                 }
                 else
                 {
@@ -51,5 +59,43 @@ namespace yummyApp.Persistance.Services.GoogleApi
                 return null;
             }
         }
+
+        public async Task<List<Review>> GetPlaceReviews(string placeId)
+        {
+            try
+            {
+                // Place Details API URL'si
+               // var url = $"https://maps.googleapis.com/maps/api/place/details/json?place_id={placeId}&fields=reviews&key={_apiKey}";
+                var url = $"https://maps.googleapis.com/maps/api/place/details/json?place_id={placeId}&fields=reviews&language=tr&key={_apiKey}";
+
+
+                var client = new HttpClient();
+                var response = await client.GetAsync(url);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+
+                    // API yanıtını modelle
+                    var detailsResult = JsonConvert.DeserializeObject<PlaceDetailsResult>(json);
+
+
+                    // Yorumları döndür
+                    return detailsResult?.Result?.Reviews ?? new List<Review>();
+                }
+                else
+                {
+                    var errorResponse = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine($"Hata oluştu: {errorResponse}");
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Bir hata oluştu: {ex.Message}");
+                return null;
+            }
+        }
+
     }
 }

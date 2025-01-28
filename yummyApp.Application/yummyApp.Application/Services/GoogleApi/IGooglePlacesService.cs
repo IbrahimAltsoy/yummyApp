@@ -4,6 +4,7 @@ namespace yummyApp.Application.Services.GoogleApi
 {
     public interface IGooglePlacesService
     {
-        Task<PlaceSearchResult> GetNearbyPlaces(double latitude, double longitude, int radius = 1500);
+        Task<PlaceSearchResult> GetNearbyPlacesAsync(double latitude, double longitude, int radius = 15000);
+        Task<List<Review>> GetPlaceReviews(string placeId);
     }
 }

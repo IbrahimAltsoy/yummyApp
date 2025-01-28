@@ -23,9 +23,17 @@ namespace yummyApp.Api.Controllers
         [HttpGet("get-nearby-places")]
         public async Task<IActionResult> GetNearbyPlaces(double latitude, double longitude)
         {
-            var places = await _googlePlacesService.GetNearbyPlaces(latitude, longitude);
+            var places = await _googlePlacesService.GetNearbyPlacesAsync(latitude, longitude);
 
             return Ok(places.Results);
+        }
+        [AllowAnonymous]
+        [HttpGet("get-reviews")]
+        public async Task<IActionResult> GetReviews(string id)
+        {
+            var places = await _googlePlacesService.GetPlaceReviews(id);
+
+            return Ok(places);
         }
         [AllowAnonymous]
         [HttpPost("addRoles")]
