@@ -41,6 +41,12 @@ namespace yummyApp.Persistance.Services.GoogleApi
                         place.PhotoUrl = firstPhoto!= null
                             ? $"https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference={firstPhoto.Photo_Reference}&key={_apiKey}"
                             : null;
+                        var placeLocation = place.Geometry?.Location;
+                        if (placeLocation != null)
+                        {
+                            // Mesafeyi hesapla
+                            place.Distance = CalculateDistance(latitude, longitude, placeLocation.Lat, placeLocation.Lng);
+                        }
                     });
 
                     return places!;
@@ -95,6 +101,26 @@ namespace yummyApp.Persistance.Services.GoogleApi
                 Console.WriteLine($"Bir hata oluştu: {ex.Message}");
                 return null;
             }
+        }
+        private double CalculateDistance(double userLat, double userLng, double placeLat, double placeLng)
+        {
+            const double EarthRadiusKm = 6371; // Dünya'nın yarıçapı (km cinsinden)
+
+            double dLat = DegreesToRadians(placeLat - userLat);
+            double dLng = DegreesToRadians(placeLng - userLng);
+
+            double a = Math.Sin(dLat / 2) * Math.Sin(dLat / 2) +
+                       Math.Cos(DegreesToRadians(userLat)) * Math.Cos(DegreesToRadians(placeLat)) *
+                       Math.Sin(dLng / 2) * Math.Sin(dLng / 2);
+
+            double c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+
+            return EarthRadiusKm * c; // Kilometre cinsinden mesafe
+        }
+
+        private double DegreesToRadians(double degrees)
+        {
+            return degrees * (Math.PI / 180);
         }
 
     }

@@ -13,8 +13,9 @@
         public List<Photo> Photos { get; set; }  // JSON: "photos"
         public string PhotoUrl { get; set; } // İlk fotoğrafın tam URL'si
         public OpeningHours Opening_Hours { get; set; }  // JSON: "opening_hours"
-        public string Distance { get; set; }  // Hesaplanan mesafe
+        public double Distance { get; set; }  // Hesaplanan mesafe
         public int User_Ratings_Total { get; set; }  // JSON: "user_ratings_total"
+        public Geometry Geometry { get; set; }
     }
 
     public class Photo
@@ -25,10 +26,17 @@
         public List<string> Html_Attributions { get; set; }
         
     }
-    //public class Html_Attributions
-    //{
+    public class Geometry
+    {
+        public Location Location { get; set; }  // JSON: "location"
+    }
 
-    //}
+    public class Location
+    {
+        public double Lat { get; set; }  // JSON: "lat"
+        public double Lng { get; set; }  // JSON: "lng"
+    }
+
 
     public class OpeningHours
     {
