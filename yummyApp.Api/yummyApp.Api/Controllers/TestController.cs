@@ -28,10 +28,10 @@ namespace yummyApp.Api.Controllers
             return Ok(places.Results);
         }
         [AllowAnonymous]
-        [HttpGet("get-reviews")]
-        public async Task<IActionResult> GetReviews(string id)
+        [HttpGet("get-business-detail/{id}")]
+        public async Task<IActionResult> GetReviews([FromRoute] string id, [FromQuery] double? latitude, [FromQuery] double? longitude)
         {
-            var places = await _googlePlacesService.GetPlaceReviews(id);
+            var places = await _googlePlacesService.GetPlaceReviews(id,latitude!.Value, longitude!.Value);
 
             return Ok(places);
         }

@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using System.Globalization;
 using yummyApp.Application.Dtos.GoogleApis;
+using yummyApp.Application.Dtos.GoogleApis.PlaceDetail;
 using yummyApp.Application.Services.GoogleApi;
 
 namespace yummyApp.Persistance.Services.GoogleApi
@@ -66,14 +67,15 @@ namespace yummyApp.Persistance.Services.GoogleApi
             }
         }
 
-        public async Task<List<Review>> GetPlaceReviews(string placeId)
+        public async Task<PlaceDetailResult> GetPlaceReviews(string placeId, double? latitude, double? longitude)
         {
             try
             {
                 // Place Details API URL'si
-               // var url = $"https://maps.googleapis.com/maps/api/place/details/json?place_id={placeId}&fields=reviews&key={_apiKey}";
-                var url = $"https://maps.googleapis.com/maps/api/place/details/json?place_id={placeId}&fields=reviews&language=tr&key={_apiKey}";
+                // var url = $"https://maps.googleapis.com/maps/api/place/details/json?place_id={placeId}&fields=reviews&key={_apiKey}";
+                //var url = $"https://maps.googleapis.com/maps/api/place/details/json?place_id={placeId}&fields=name,formatted_address,formatted_phone_number,website,opening_hours,geometry,rating,user_ratings_total,photos,reviews&key={_apiKey}";
 
+                var url = $"https://maps.googleapis.com/maps/api/place/details/json?place_id={placeId}&fields=name,formatted_address,formatted_phone_number,website,opening_hours,geometry,rating,user_ratings_total,photos,vicinity,reviews&language=tr&key={_apiKey}";
 
                 var client = new HttpClient();
                 var response = await client.GetAsync(url);
@@ -83,23 +85,35 @@ namespace yummyApp.Persistance.Services.GoogleApi
                     var json = await response.Content.ReadAsStringAsync();
 
                     // API yanıtını modelle
-                    var detailsResult = JsonConvert.DeserializeObject<PlaceDetailsResult>(json);
+                    var detailsResult = JsonConvert.DeserializeObject<PlaceDetailResult>(json);
 
-
+                    if (detailsResult?.Result?.Photos != null)
+                    {
+                        detailsResult.Result.PhotoUrls = detailsResult.Result.Photos
+                            .Select(p => $"https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference={p.Photo_Reference}&key={_apiKey}")
+                            .ToList();
+                    }
+                    var placeLocation = detailsResult?.Result.Geometry?.Location;
+                    if (placeLocation != null)
+                    {
+                        // Mesafeyi hesapla
+                        detailsResult!.Result.Distance = CalculateDistance(latitude!.Value, longitude!.Value, placeLocation.Lat, placeLocation.Lng);
+                    }
                     // Yorumları döndür
-                    return detailsResult?.Result?.Reviews ?? new List<Review>();
+
+                    return detailsResult ?? new PlaceDetailResult();
                 }
                 else
                 {
                     var errorResponse = await response.Content.ReadAsStringAsync();
                     Console.WriteLine($"Hata oluştu: {errorResponse}");
-                    return null;
+                    return null!;
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Bir hata oluştu: {ex.Message}");
-                return null;
+                return null!;
             }
         }
         private double CalculateDistance(double userLat, double userLng, double placeLat, double placeLng)
