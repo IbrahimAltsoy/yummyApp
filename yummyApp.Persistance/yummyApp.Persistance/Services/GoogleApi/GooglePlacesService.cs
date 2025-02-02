@@ -4,6 +4,7 @@ using System.Globalization;
 using yummyApp.Application.Dtos.GoogleApis;
 using yummyApp.Application.Dtos.GoogleApis.PlaceDetail;
 using yummyApp.Application.Services.GoogleApi;
+using yummyApp.Domain.Enums;
 
 namespace yummyApp.Persistance.Services.GoogleApi
 {
@@ -19,51 +20,45 @@ namespace yummyApp.Persistance.Services.GoogleApi
             _httpClient = new HttpClient();
         }
 
-        public async Task<PlaceSearchResult> GetNearbyPlacesAsync(double latitude, double longitude, int radius = 15000)
-        {
-
-            // https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=38,4192,27,1287&radius=150000&key=AIzaSyDXEKGz7AjjAsE959dnItLbfmCju2v5LDU
-            // https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=38.4192,27.1287&radius=1500&key=AIzaSyDXEKGz7AjjAsE959dnItLbfmCju2v5LDU
+        public async Task<PlaceSearchResult> GetNearbyPlacesAsync(string category,double latitude, double longitude, int radius = 15000)
+        {           
             try
             {
                 var client = new HttpClient();
-                var ap = _apiKey;
-
-                var url = $"https://maps.googleapis.com/maps/api/place/nearbysearch/json?location={latitude.ToString(CultureInfo.InvariantCulture)},{longitude.ToString(CultureInfo.InvariantCulture)}&radius={radius}&type=restaurant&key={_apiKey}";
+                //List<string> placeTypes = GetPlaceTypesByCategory(category);
+                //string selectedType = placeTypes.FirstOrDefault() ?? "restaurant";
+                var url = $"https://maps.googleapis.com/maps/api/place/nearbysearch/json?location={latitude.ToString(CultureInfo.InvariantCulture)},{longitude.ToString(CultureInfo.InvariantCulture)}&radius={radius}&type={category}&key={_apiKey}";
                 var response = await client.GetAsync(url);
 
                 if (response.IsSuccessStatusCode)
                 {
                     var json = await response.Content.ReadAsStringAsync();
                     var places = JsonConvert.DeserializeObject<PlaceSearchResult>(json);
-                    Parallel.ForEach(places.Results, place =>
+                    foreach (var place in places.Results)
                     {
                         var firstPhoto = place.Photos?.FirstOrDefault();
-                        place.PhotoUrl = firstPhoto!= null
+                        place.PhotoUrl = firstPhoto != null
                             ? $"https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference={firstPhoto.Photo_Reference}&key={_apiKey}"
                             : null;
-                        var placeLocation = place.Geometry?.Location;
-                        if (placeLocation != null)
+
+                        if (place.Geometry?.Location != null)
                         {
-                            // Mesafeyi hesapla
-                            place.Distance = CalculateDistance(latitude, longitude, placeLocation.Lat, placeLocation.Lng);
+                            place.Distance = await GetGoogleMapsDistance(latitude, longitude, place.Geometry.Location.Lat, place.Geometry.Location.Lng);
                         }
-                    });
+                    }
+
 
                     return places!;
                 }
                 else
                 {
-                    // Hata durumunda daha detaylı hata mesajı al
                     var errorResponse = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine($"Hata oluştu: {errorResponse}");
-                    return null;
+                    return null!;
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Bir hata oluştu: {ex.Message}");
-                return null;
+                return null!;
             }
         }
 
@@ -71,10 +66,6 @@ namespace yummyApp.Persistance.Services.GoogleApi
         {
             try
             {
-                // Place Details API URL'si
-                // var url = $"https://maps.googleapis.com/maps/api/place/details/json?place_id={placeId}&fields=reviews&key={_apiKey}";
-                //var url = $"https://maps.googleapis.com/maps/api/place/details/json?place_id={placeId}&fields=name,formatted_address,formatted_phone_number,website,opening_hours,geometry,rating,user_ratings_total,photos,reviews&key={_apiKey}";
-
                 var url = $"https://maps.googleapis.com/maps/api/place/details/json?place_id={placeId}&fields=name,formatted_address,formatted_phone_number,website,opening_hours,geometry,rating,user_ratings_total,photos,vicinity,reviews&language=tr&key={_apiKey}";
 
                 var client = new HttpClient();
@@ -83,10 +74,7 @@ namespace yummyApp.Persistance.Services.GoogleApi
                 if (response.IsSuccessStatusCode)
                 {
                     var json = await response.Content.ReadAsStringAsync();
-
-                    // API yanıtını modelle
                     var detailsResult = JsonConvert.DeserializeObject<PlaceDetailResult>(json);
-
                     if (detailsResult?.Result?.Photos != null)
                     {
                         detailsResult.Result.PhotoUrls = detailsResult.Result.Photos
@@ -96,46 +84,78 @@ namespace yummyApp.Persistance.Services.GoogleApi
                     var placeLocation = detailsResult?.Result.Geometry?.Location;
                     if (placeLocation != null)
                     {
-                        // Mesafeyi hesapla
-                        detailsResult!.Result.Distance = CalculateDistance(latitude!.Value, longitude!.Value, placeLocation.Lat, placeLocation.Lng);
+                        detailsResult!.Result.Distance = await GetGoogleMapsDistance(latitude!.Value, longitude!.Value, placeLocation.Lat, placeLocation.Lng);
                     }
-                    // Yorumları döndür
-
                     return detailsResult ?? new PlaceDetailResult();
                 }
                 else
                 {
                     var errorResponse = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine($"Hata oluştu: {errorResponse}");
                     return null!;
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Bir hata oluştu: {ex.Message}");
                 return null!;
             }
-        }
-        private double CalculateDistance(double userLat, double userLng, double placeLat, double placeLng)
+        }       
+        private async Task<double> GetGoogleMapsDistance(double userLat, double userLng, double placeLat, double placeLng)
         {
-            const double EarthRadiusKm = 6371; // Dünya'nın yarıçapı (km cinsinden)
 
-            double dLat = DegreesToRadians(placeLat - userLat);
-            double dLng = DegreesToRadians(placeLng - userLng);
+          
+            string url = $"https://maps.googleapis.com/maps/api/distancematrix/json?origins={userLat.ToString(CultureInfo.InvariantCulture)},{userLng.ToString(CultureInfo.InvariantCulture)}&destinations={placeLat.ToString(CultureInfo.InvariantCulture)},{placeLng.ToString(CultureInfo.InvariantCulture)}&mode=driving&key={_apiKey}";
 
-            double a = Math.Sin(dLat / 2) * Math.Sin(dLat / 2) +
-                       Math.Cos(DegreesToRadians(userLat)) * Math.Cos(DegreesToRadians(placeLat)) *
-                       Math.Sin(dLng / 2) * Math.Sin(dLng / 2);
+            Console.WriteLine($"📍 Google Maps API URL: {url}");
 
-            double c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
 
-            return EarthRadiusKm * c; // Kilometre cinsinden mesafe
+            using (HttpClient client = new HttpClient())
+            {
+                HttpResponseMessage response = await client.GetAsync(url);
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    dynamic result = JsonConvert.DeserializeObject(json);
+                    double distanceMeters = result.rows[0].elements[0].distance.value;
+                    double distanceKm = distanceMeters / 1000;
+                    return distanceKm;
+                }
+            }
+            return -1; 
         }
+
 
         private double DegreesToRadians(double degrees)
         {
             return degrees * (Math.PI / 180);
         }
+        private List<string> GetPlaceTypesByCategory(string category)
+        {
+            return category.ToLower() switch
+            {
+                "general" => Enum.GetValues(typeof(PlaceCategories.General))
+                                 .Cast<PlaceCategories.General>()
+                                 .Select(e => e.ToString().ToLower())
+                                 .ToList(),
+
+                "services" => Enum.GetValues(typeof(PlaceCategories.Services))
+                                  .Cast<PlaceCategories.Services>()
+                                  .Select(e => e.ToString().ToLower())
+                                  .ToList(),
+
+                "entertainment" => Enum.GetValues(typeof(PlaceCategories.Entertainment))
+                                       .Cast<PlaceCategories.Entertainment>()
+                                       .Select(e => e.ToString().ToLower())
+                                       .ToList(),
+
+                "travel" => Enum.GetValues(typeof(PlaceCategories.Travel))
+                                .Cast<PlaceCategories.Travel>()
+                                .Select(e => e.ToString().ToLower())
+                                .ToList(),
+
+                _ => new List<string> { "restaurant" } // ❗ Geçersiz kategori gelirse "restaurant" döndür
+            };
+        }
 
     }
 }
+//var url = $"https://maps.googleapis.com/maps/api/distancematrix/json?origins={lat1},{lon1}&destinations={lat2},{lon2}&key=YOUR_GOOGLE_API_KEY";
