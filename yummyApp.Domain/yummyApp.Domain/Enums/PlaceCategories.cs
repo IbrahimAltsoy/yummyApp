@@ -45,7 +45,9 @@
         }
         public enum Other
         {
-            NEri, NEriii, EsrarShop
+            Hindu_Temple,
+            Synagogue,
+            Train_Station
         }
     }
 

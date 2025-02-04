@@ -20,7 +20,7 @@ namespace yummyApp.Persistance.Services.GoogleApi
             _httpClient = new HttpClient();
         }
 
-        public async Task<PlaceSearchResult> GetNearbyPlacesAsync(string category,double latitude, double longitude, int radius = 15000)
+        public async Task<PlaceSearchResult> GetNearbyPlacesAsync(string category,double latitude, double longitude, int radius)
         {           
             try
             {
@@ -46,9 +46,8 @@ namespace yummyApp.Persistance.Services.GoogleApi
                             place.Distance = await GetGoogleMapsDistance(latitude, longitude, place.Geometry.Location.Lat, place.Geometry.Location.Lng);
                         }
                     }
-
-
-                    return places!;
+                    //var filterData = places.Results.OrderBy(x=>x.User_Ratings_Total).ToList();
+                    return places;
                 }
                 else
                 {
