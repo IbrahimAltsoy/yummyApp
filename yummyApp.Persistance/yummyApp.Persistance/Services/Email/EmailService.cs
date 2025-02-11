@@ -80,7 +80,6 @@ namespace yummyApp.Persistance.Services.Email
 
             mail.AppendLine("<span style=\"font-size:12px;\">NOT : Eğer ki bu talep tarafınızca gerçekleştirilmemişse lütfen bu maili ciddiye almayınız.</span><br>");
             mail.AppendLine("Saygılarımızla...<br><br><br>yummyApp Company");
-            //url = $"<strong><a target=\"_blank\" href=\"{AngularClientUrl}/login/{userId}/{resetToken}\">Yeni şifre talebi için tıklayınız...</a></strong><br><br>";
             await SendMailAsync(to, "Şifre Yenileme Talebi", mail.ToString());
 
 

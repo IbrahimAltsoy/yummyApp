@@ -19,6 +19,8 @@ using yummyApp.Application.Features.Users.Commands.Register;
 using yummyApp.Application.Abstract.DbContext;
 using yummyApp.Application.Features.Users.Rules;
 using Azure.Core;
+using System.Net;
+using yummyApp.Persistance.Services.Email;
 
 
 
@@ -95,7 +97,7 @@ namespace yummyApp.Persistance.Services.Authencation
             if (user != null)
             {
                 string resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
-                resetToken = resetToken.UrlEncode();
+                //resetToken = resetToken.UrlEncode();
                 await _emailService.SendPasswordResetMailAsync(email, user.Id.ToString(), resetToken);
 
             }
@@ -107,9 +109,7 @@ namespace yummyApp.Persistance.Services.Authencation
         {
             AppUser? user = await _userManager.FindByIdAsync(userId);
             if (user != null)
-            {
-                //byte[] tokenBytes = WebEncoders.Base64UrlDecode(resetToken);
-                //resetToken = Encoding.UTF8.GetString(tokenBytes);
+            {                
                 resetToken = resetToken.UrlDecode();
                 return await _userManager.VerifyUserTokenAsync(user, _userManager.Options.Tokens.PasswordResetTokenProvider, "ResetPassword", resetToken);
             }
@@ -119,7 +119,7 @@ namespace yummyApp.Persistance.Services.Authencation
         {
             var settings = new GoogleJsonWebSignature.ValidationSettings()
             {
-                Audience = new List<string> { _configuration["Google:PROVIDER_ID"] }
+                Audience = new List<string> { _configuration["Google:PROVIDER_ID"]! }
             };
             var payload = await GoogleJsonWebSignature.ValidateAsync(idToken, settings);
             var info = new UserLoginInfo("GOOGLE", payload.Subject, "GOOGLE");
@@ -133,8 +133,7 @@ namespace yummyApp.Persistance.Services.Authencation
                 if (user == null)
                 {
                     user = new AppUser()
-                    {
-                        //Id = Guid.NewGuid().ToString(),
+                    {                      
                         Email = payload.Email,
                         UserName = payload.Email,
                         Surname = payload.Name,
@@ -181,10 +180,10 @@ namespace yummyApp.Persistance.Services.Authencation
                 RegisterCommandResponse response = new() { Success = result.Succeeded };
                 if (response.Success)
                 {
-
                     string encodedEmail = Uri.EscapeDataString(request.Email);
                     string encodedActivationCode = Uri.EscapeDataString(activeCode);
-                    string activationLink = $"https://localhost:7009/api/Auth/verify-email?Email={encodedEmail}&ActivationCode={encodedActivationCode}";
+                string mobileBaseUrl = _configuration["ApplicationSettings:MobileApplication"]!;
+                string activationLink = $"{mobileBaseUrl}/api/Auth/verify-email?Email={encodedEmail}&ActivationCode={encodedActivationCode}";
                     await _emailService.SendMailAsync(
                         request.Email,
                         "Aktivasyon Kodu",
@@ -202,6 +201,20 @@ namespace yummyApp.Persistance.Services.Authencation
                 }
                 return response;
 
+        }
+
+        public async Task<bool> ResetPasswordWithTokenAsync(string userId, string token, string newPassword)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null) return false;
+            string decodedToken = Uri.UnescapeDataString(token);            
+            var resetPasswordResult = await _userManager.ResetPasswordAsync(user, decodedToken, newPassword);
+            if (!resetPasswordResult.Succeeded)
+            {
+                string errors = string.Join(", ", resetPasswordResult.Errors.Select(e => e.Description));
+                return false;
+            }
+            return true;
         }
     }
 }

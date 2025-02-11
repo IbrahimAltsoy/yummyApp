@@ -33,8 +33,8 @@ namespace yummyApp.Api
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = exception switch
             {
-                UserEmailVerifyCheckException => (int)HttpStatusCode.BadRequest, // 400 Bad Request
-                _ => (int)HttpStatusCode.InternalServerError // 500 Internal Server Error
+                UserEmailVerifyCheckException => (int)HttpStatusCode.BadRequest, 
+                _ => (int)HttpStatusCode.InternalServerError
             };
 
             var response = new
