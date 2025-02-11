@@ -75,7 +75,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 var app = builder.Build();
-
 Log.Information("Starting application...");
 
 // Configure the HTTP request pipeline.
@@ -93,6 +92,7 @@ app.UseRouting();
 app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseMiddleware<ExceptionMiddleware>();
 
 // Enable middleware to serve generated Swagger as a JSON endpoint.
 app.UseSwagger();

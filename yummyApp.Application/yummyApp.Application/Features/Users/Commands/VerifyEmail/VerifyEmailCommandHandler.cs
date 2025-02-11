@@ -30,7 +30,8 @@ namespace yummyApp.Application.Features.Users.Commands.VerifyEmail
                 };
 
             user.IsActive = true; 
-            user.ActivationCode = "";            
+            user.ActivationCode = "";
+            user.EmailConfirmed = true;
             await _userManager.UpdateAsync(user);
             await _userManager.AddToRoleAsync(user, "User");
             return new VerifyEmailCommandResponse()

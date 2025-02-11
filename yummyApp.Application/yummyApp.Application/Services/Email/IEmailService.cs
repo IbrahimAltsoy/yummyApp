@@ -12,5 +12,8 @@ namespace yummyApp.Application.Services.Email
         Task SendMailAsync(string[] tos, string subject, string body, bool isBodyHtml = true);
 
         Task SendPasswordResetMailAsync(string to, string userId, string resetToken);
+
+        Task<string> CreateEmailActivationKey();
+        Task SendActivationEmailAsync(string email, string activationCode);
     }
 }

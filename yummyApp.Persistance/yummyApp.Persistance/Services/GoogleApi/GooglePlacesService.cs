@@ -131,25 +131,51 @@ namespace yummyApp.Persistance.Services.GoogleApi
         {
             return category.ToLower() switch
             {
-                "general" => Enum.GetValues(typeof(PlaceCategories.General))
-                                 .Cast<PlaceCategories.General>()
+                "foodDrink" => Enum.GetValues(typeof(PlaceCategories.FoodDrink))
+                                 .Cast<PlaceCategories.FoodDrink>()
                                  .Select(e => e.ToString().ToLower())
                                  .ToList(),
 
-                "services" => Enum.GetValues(typeof(PlaceCategories.Services))
-                                  .Cast<PlaceCategories.Services>()
+                "healthCare" => Enum.GetValues(typeof(PlaceCategories.HealthCare))
+                                  .Cast<PlaceCategories.HealthCare>()
                                   .Select(e => e.ToString().ToLower())
                                   .ToList(),
 
-                "entertainment" => Enum.GetValues(typeof(PlaceCategories.Entertainment))
-                                       .Cast<PlaceCategories.Entertainment>()
+                "education" => Enum.GetValues(typeof(PlaceCategories.Education))
+                                       .Cast<PlaceCategories.Education>()
                                        .Select(e => e.ToString().ToLower())
                                        .ToList(),
 
-                "travel" => Enum.GetValues(typeof(PlaceCategories.Travel))
-                                .Cast<PlaceCategories.Travel>()
+                "transportTravel" => Enum.GetValues(typeof(PlaceCategories.TransportTravel))
+                                .Cast<PlaceCategories.TransportTravel>()
                                 .Select(e => e.ToString().ToLower())
                                 .ToList(),
+
+                "shopping" => Enum.GetValues(typeof(PlaceCategories.Shopping))
+               .Cast<PlaceCategories.Shopping>()
+               .Select(e => e.ToString().ToLower())
+               .ToList(),
+
+                "publicServices" => Enum.GetValues(typeof(PlaceCategories.PublicServices))
+                .Cast<PlaceCategories.PublicServices>()
+                .Select(e => e.ToString().ToLower())
+                .ToList(),
+
+                "entertainmentLeisure" => Enum.GetValues(typeof(PlaceCategories.EntertainmentLeisure))
+               .Cast<PlaceCategories.EntertainmentLeisure>()
+               .Select(e => e.ToString().ToLower())
+               .ToList(),
+
+
+                "finance" => Enum.GetValues(typeof(PlaceCategories.Finance))
+                .Cast<PlaceCategories.Finance>()
+                .Select(e => e.ToString().ToLower())
+                .ToList(),
+
+                "services" => Enum.GetValues(typeof(PlaceCategories.Services))
+               .Cast<PlaceCategories.Services>()
+               .Select(e => e.ToString().ToLower())
+               .ToList(),
 
                 _ => new List<string> { "restaurant" } // ❗ Geçersiz kategori gelirse "restaurant" döndür
             };

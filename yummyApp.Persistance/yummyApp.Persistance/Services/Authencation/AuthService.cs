@@ -17,6 +17,8 @@ using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 using yummyApp.Application.Features.Users.Commands.Register;
 using yummyApp.Application.Abstract.DbContext;
+using yummyApp.Application.Features.Users.Rules;
+using Azure.Core;
 
 
 
@@ -34,9 +36,10 @@ namespace yummyApp.Persistance.Services.Authencation
         readonly IEmailService _emailService;
         readonly IHttpContextAccessor _httpContextAccessor;
         readonly IYummyAppDbContext _yummyAppDbContext;
-       
+        readonly AuthBusinessRules _authBusinessRules;
 
-        public AuthService(HttpClient httpClient, UserManager<AppUser> userManager, ITokenHandler tokenHandler, IConfiguration configuration, SignInManager<AppUser> signInManager, IUserService userService, IEmailService emailService, IHttpContextAccessor httpContextAccessor, IYummyAppDbContext yummyAppDbContext)
+
+        public AuthService(HttpClient httpClient, UserManager<AppUser> userManager, ITokenHandler tokenHandler, IConfiguration configuration, SignInManager<AppUser> signInManager, IUserService userService, IEmailService emailService, IHttpContextAccessor httpContextAccessor, IYummyAppDbContext yummyAppDbContext, AuthBusinessRules authBusinessRules)
         {
             _httpClient = httpClient;
             _userManager = userManager;
@@ -47,6 +50,7 @@ namespace yummyApp.Persistance.Services.Authencation
             _emailService = emailService;
             _httpContextAccessor = httpContextAccessor;
             _yummyAppDbContext = yummyAppDbContext;
+            _authBusinessRules = authBusinessRules;
            
         }
         public async Task<Token> LoginAsync(string userNameOrEmail, string password, int accessTokenLifeTime)
@@ -57,6 +61,8 @@ namespace yummyApp.Persistance.Services.Authencation
                 user = await _userManager.FindByEmailAsync(userNameOrEmail);
             if (user == null)
                 throw new NotFoundUserExceptions();
+            await _authBusinessRules.UserShouldBeExists(user);
+            await _authBusinessRules.UserEmailVerifyCheck(user);
             SignInResult result = await _signInManager.CheckPasswordSignInAsync(user, password, false);
             if (result.Succeeded)
             {

@@ -2,7 +2,9 @@
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 using yummyApp.Application.Behaviors;
+using yummyApp.Application.Features.Users.Rules;
 using yummyApp.Application.Repositories;
+using yummyApp.Application.Rules;
 
 namespace yummyApp.Application
 {
@@ -14,6 +16,8 @@ namespace yummyApp.Application
             var assembly = Assembly.GetExecutingAssembly();
             services.AddAutoMapper(assembly);
             services.AddValidatorsFromAssembly(assembly);
+            //services.AddSubClassesOfType(Assembly.GetExecutingAssembly(), typeof(BaseBusinessRules));
+            services.AddScoped<AuthBusinessRules>();
             services.AddMediatR(media =>
             {
                 media.RegisterServicesFromAssembly(assembly);

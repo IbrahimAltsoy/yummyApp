@@ -3,6 +3,7 @@ using System.Net.Mail;
 using System.Net;
 using System.Text;
 using yummyApp.Application.Services.Email;
+using System.Security.Cryptography;
 
 namespace yummyApp.Persistance.Services.Email
 {
@@ -14,6 +15,22 @@ namespace yummyApp.Persistance.Services.Email
         {
             _configuration = configuration;
         }
+
+        public Task<string> CreateEmailActivationKey()
+        {
+            string key = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
+            return Task.FromResult(key);
+        }
+
+        public async Task SendActivationEmailAsync(string email, string activationCode)
+        {
+            string activationLink = $"https://localhost:5218/api/Auth/VerifyEmail?Email={Uri.EscapeDataString(email)}&ActivationCode={Uri.EscapeDataString(activationCode)}";
+            await SendMailAsync(
+                email,
+                "Aktivasyon Kodu",
+                $"Kaydınızı doğrulamak için aşağıdaki bağlantıya tıklayınız: <a href='{activationLink}'>Aktivasyon Linki</a>");
+        }
+
         public async Task SendMailAsync(string to, string subject, string body, bool isBodyHtml = true)
         {
             await SendMailAsync(new[] { to }, subject, body, isBodyHtml);
