@@ -14,13 +14,20 @@ namespace yummyApp.Application.Features.Users.Queries.GetUserById
         public async Task<GetUserByIdQueryResponse> Handle(GetUserByIdQueryRequest request, CancellationToken cancellationToken)
         {
             UserReadDto user = await _userService.GetUserByIdAsync(request.Id);
-            return new()
+            if (user!=null)
             {
-                Name = user.Name,
-                Surname = user.Surname,
-                UserName = user.UserName,
-                Email = user.Email
-            };
+                return new()
+                {
+                    Name = user.Name,
+                    Surname = user.Surname,
+                    UserName = user.UserName,
+                    Email = user.Email,
+                    PhoneNumber = user.PhoneNumber,
+                    ImageUrl = user.ImageUrl,
+                };
+            }
+            return new();
+           
         }
     }
 }

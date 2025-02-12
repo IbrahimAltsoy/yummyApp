@@ -25,7 +25,7 @@ namespace yummyApp.Api.Controllers
             return Ok(response);
 
         }
-        [HttpGet("{id}")]
+        [HttpGet("id")]
         public async Task<IActionResult> GetById([FromQuery] GetUserByIdQueryRequest request)
         {
             GetUserByIdQueryResponse response = await _mediator.Send(request);
@@ -43,14 +43,6 @@ namespace yummyApp.Api.Controllers
             UpdateUserCommandResponse response = await _mediator.Send(request);
 
             return Ok("Güncelleme başarılı bir şekilde yapılmıştır.");
-        }
-        //[HttpPost("update-password")]
-        //public async Task<IActionResult> UpdatePassword([FromBody] UpdatePasswordCommandRequest request)
-        //{
-        //    UpdatePasswordCommandResponse response = await _mediator.Send(request);
-        //    int a = 5;
-        //    return Ok(response);
-
-        //}
+        }       
     }
 }

@@ -29,6 +29,7 @@ namespace yummyApp.Application.Features.Users.Queries.GetAll
                 u.IsActive,
                 u.PhoneNumber,
                 u.Email,
+                u.ImageUrl,
                 
             }).ToList();
             return new()
