@@ -17,6 +17,7 @@ using yummyApp.Application.Services.Email;
 using yummyApp.Application.Services.Users;
 using yummyApp.Application.Tokens;
 using yummyApp.Domain.Identity;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace yummyApp.Persistance.Services.Users
 {
@@ -80,7 +81,43 @@ namespace yummyApp.Persistance.Services.Users
             }
             return response;
         }
-        
+        public async Task<bool> SoftDeleteUserAsync(Guid userId)
+        {
+            var user = await _dbContext.AppUsers.FindAsync(userId);
+            if (user is not null)
+            {
+                _dbContext.AppUsers.Remove(user);
+                await _dbContext.SaveChangesAsync();
+                return true;
+            }
+            return false;
+        }
+
+        public async Task<bool> HardDeleteUserAsync(Guid userId)
+        {
+            var dbContext = _dbContext as YummyAppDbContext;
+            if (dbContext == null)
+                throw new InvalidOperationException("DbContext instance bulunamadı!");
+            var user = await dbContext.AppUsers
+                .IgnoreQueryFilters()
+                .FirstOrDefaultAsync(u => u.Id == userId && u.DeletedAt < DateTime.UtcNow.AddDays(-30));
+            if (user is not null)
+            {
+                await dbContext.Database.ExecuteSqlRawAsync(
+                    "DELETE FROM AspNetUserRoles WHERE UserId = {0}", userId
+                );
+                int deletedRows = await dbContext.Database.ExecuteSqlRawAsync(
+                    "DELETE FROM AspNetUsers WHERE Id = {0}", userId
+                );
+                return deletedRows > 0;
+            }
+            return false;
+        }
+
+
+
+
+
         public async Task<List<UserReadDto>> GetUserAllAsync()
         {
             List<AppUser> users =  _dbContext.AppUsers.ToList();

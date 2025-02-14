@@ -1,7 +1,10 @@
-﻿using MediatR;
+﻿using Hangfire;
+using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using yummyApp.Application.BackGroundJobs;
 using yummyApp.Application.Features.Users.Commands.Create;
+using yummyApp.Application.Features.Users.Commands.Delete;
 using yummyApp.Application.Features.Users.Commands.Update;
 using yummyApp.Application.Features.Users.Queries.GetAll;
 using yummyApp.Application.Features.Users.Queries.GetUserById;
@@ -21,6 +24,8 @@ namespace yummyApp.Api.Controllers
         [HttpGet]
         public async Task<IActionResult> Get([FromQuery] GetAllUserQueryRequest request)
         {
+            BackgroundJob.Enqueue<UserDeletionJob>(x => x.RunScheduledUserDeletion());
+
             GetAllUserQueryResponse response = await _mediator.Send(request);
             return Ok(response);
 
@@ -43,6 +48,12 @@ namespace yummyApp.Api.Controllers
             UpdateUserCommandResponse response = await _mediator.Send(request);
 
             return Ok("Güncelleme başarılı bir şekilde yapılmıştır.");
-        }       
+        }
+        [HttpDelete]
+        public async Task<IActionResult> Delete(DeleteUserCommandRequest request)
+        {
+            DeleteUserCommandResponse response = await _mediator.Send(request);
+            return Ok(response);
+        }
     }
 }

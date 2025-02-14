@@ -11,6 +11,8 @@ using yummyApp.Persistance.Context;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Identity;
 using yummyApp.Domain.Identity;
+using Hangfire;
+using yummyApp.Application.BackGroundJobs;
 
 #region Serilog Configuration
 Log.Logger = new LoggerConfiguration()
@@ -60,7 +62,14 @@ builder.Services.AddIdentityCore<AppUser>(options =>
 })
     .AddEntityFrameworkStores<YummyAppDbContext>()
     .AddDefaultTokenProviders(); // Şifre sıfırlama ve e-posta doğrulama için gerekli
-
+//Hangfire işlemleri için
+builder.Services.AddHangfire(config =>
+    config.SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+        .UseSimpleAssemblyNameTypeSerializer()
+        .UseRecommendedSerializerSettings()
+        .UseSqlServerStorage(builder.Configuration.GetConnectionString("DefaultConnection")) 
+);
+builder.Services.AddHangfireServer();
 // Şifre sıfırlama token süresini uzat
 builder.Services.Configure<DataProtectionTokenProviderOptions>(options =>
 {
@@ -91,6 +100,14 @@ if (app.Environment.IsDevelopment())
     app.UseDeveloperExceptionPage();
     await app.InitializeDb(); 
 }
+app.UseHangfireDashboard("/hangfire");
+
+// 📌 Zamanlanmış Görev 
+RecurringJob.AddOrUpdate<UserDeletionJob>(
+    x => x.RunScheduledUserDeletion(),
+    Cron.Daily(3, 00)
+);
+app.UseHangfireServer();
 
 app.UseExceptionHandler("/Home/Error");
 //app.UseHttpsRedirection(); // burasının kapanma sebebi mobilden gelen istekleri kabul etsin diye kapatıldı.

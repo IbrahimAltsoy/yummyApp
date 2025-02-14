@@ -29,6 +29,7 @@ namespace yummyApp.Infrastructure.Token
             var claims = new List<Claim>
     {
        // burada eklemeler yapıldı
+       new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
         new Claim(ClaimTypes.Email, user.Email), 
         new Claim(ClaimTypes.Name, user.Name +" "+ user.Surname) 
      

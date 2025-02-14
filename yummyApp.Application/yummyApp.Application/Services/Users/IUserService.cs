@@ -14,6 +14,8 @@ namespace yummyApp.Application.Services.Users
         Task<UserReadDto> GetUserByIdAsync(Guid userId);
         Task UpdateRefreshToken(string refreshToken, AppUser user, DateTime accessTokenDate, int addOnAccessTokenTime);
         Task UpdatePasswordAsync(Guid userId, string resetToken, string newPassword);
+        Task<bool> SoftDeleteUserAsync(Guid userId);
+        Task<bool> HardDeleteUserAsync(Guid userId);
         //Task<string> GetUserRoleAsync(UserReadDto user);
     }
 }
