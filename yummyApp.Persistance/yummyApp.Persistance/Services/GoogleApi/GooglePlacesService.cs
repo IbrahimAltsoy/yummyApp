@@ -16,7 +16,7 @@ namespace yummyApp.Persistance.Services.GoogleApi
         // IConfiguration ile API Key'i al
         public GooglePlacesService(IConfiguration configuration)
         {
-            _apiKey = configuration["GoogleApi:ApiKey"]; // appsettings.json'dan API Key'i al
+            _apiKey = configuration["GoogleApi:ApiKey"]!; // appsettings.json'dan API Key'i al
             _httpClient = new HttpClient();
         }
 
@@ -37,7 +37,7 @@ namespace yummyApp.Persistance.Services.GoogleApi
                     foreach (var place in places.Results)
                     {
                         var firstPhoto = place.Photos?.FirstOrDefault();
-                        place.PhotoUrl = firstPhoto != null
+                        place.PhotoUrl = firstPhoto!= null
                             ? $"https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference={firstPhoto.Photo_Reference}&key={_apiKey}"
                             : null;
 
@@ -61,7 +61,7 @@ namespace yummyApp.Persistance.Services.GoogleApi
             }
         }
 
-        public async Task<PlaceDetailResult> GetPlaceReviews(string placeId, double? latitude, double? longitude)
+        public async Task<PlaceDetailResult> GetPlaceDetailAndReviews(string placeId, double? latitude, double? longitude)
         {
             try
             {

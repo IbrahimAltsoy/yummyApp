@@ -32,7 +32,7 @@ namespace yummyApp.Api.Controllers
         [HttpGet("get-business-detail/{id}")]
         public async Task<IActionResult> GetReviews([FromRoute] string id, [FromQuery] double? latitude, [FromQuery] double? longitude)
         {
-            var places = await _googlePlacesService.GetPlaceReviews(id,latitude!.Value, longitude!.Value);
+            var places = await _googlePlacesService.GetPlaceDetailAndReviews(id,latitude!.Value, longitude!.Value);
 
             return Ok(places);
         }
