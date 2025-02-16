@@ -1,6 +1,9 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using yummyApp.Application.Features.Businesses.Commands.CreateBusiness;
 using yummyApp.Application.Features.Businesses.Commands.DeleteBusiness;
 using yummyApp.Application.Features.Businesses.Commands.UpdateBusiness;
@@ -10,8 +13,9 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace yummyApp.Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Authorize]
     [ApiController]
+    [Route("api/[controller]")]
     public class BusinessController : ControllerBase
     {
         readonly IMediator _mediator;
@@ -20,9 +24,11 @@ namespace yummyApp.Api.Controllers
         {
             _mediator = mediator;
         }
+
+    
         [HttpGet]
-        public async Task<IActionResult> Get([FromQuery]GetAllBusinessQueryRequest request)
-        {
+        public async Task<IActionResult> Get([FromQuery] GetAllBusinessQueryRequest request)
+        { 
             IList<GetAllBusinessQueryResponse> response = await _mediator.Send(request);
             return Ok(response);
         }

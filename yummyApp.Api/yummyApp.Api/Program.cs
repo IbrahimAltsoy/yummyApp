@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Identity;
 using yummyApp.Domain.Identity;
 using Hangfire;
 using yummyApp.Application.BackGroundJobs;
+using yummyApp.Api.Filters;
 
 #region Serilog Configuration
 Log.Logger = new LoggerConfiguration()
@@ -54,8 +55,36 @@ builder.Services.AddCors(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "YummyApp API", Version = "v1" });
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        In = ParameterLocation.Header,
+        Description = "JWT Authorization header kullanarak giriş yapın. Örn: Bearer {token}",
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer",
+        BearerFormat ="JWT"
+        
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                },
+                Scheme = "oauth2",
+                Name = "Bearer",
+                In = ParameterLocation.Header,
+            },
+            new List<string>()
+        }
+    });
 });
+
 builder.Services.AddIdentityCore<AppUser>(options =>
 {
     options.Tokens.PasswordResetTokenProvider = TokenOptions.DefaultProvider;
@@ -75,23 +104,31 @@ builder.Services.Configure<DataProtectionTokenProviderOptions>(options =>
 {
     options.TokenLifespan = TimeSpan.FromHours(24); // Şifre sıfırlama token süresi 3 saat
 });
-// Configure JWT Authentication
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer("Admin", options =>
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+
+})
+.AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+{    
+    options.TokenValidationParameters = new TokenValidationParameters
     {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateAudience = true,
-            ValidateIssuer = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidAudience = builder.Configuration["Token:Audience"],
-            ValidIssuer = builder.Configuration["Token:Issuer"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Token:SecurityKey"]!)),
-            LifetimeValidator = (notBefore, expires, securityToken, validationParameters) => expires != null ? expires > DateTime.UtcNow : false,
-            NameClaimType = ClaimTypes.NameIdentifier,
-        };
-    });
+        ValidateAudience = true,
+        ValidateIssuer = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidAudience = builder.Configuration["Token:Audience"],
+        ValidIssuer = builder.Configuration["Token:Issuer"],
+        IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(Convert.ToBase64String(Encoding.UTF8.GetBytes(builder.Configuration["Token:SecurityKey"]!)))),
+        LifetimeValidator = (notBefore, expires, securityToken, validationParameters) =>
+            expires != null ? expires > DateTime.UtcNow : false,
+        NameClaimType = ClaimTypes.NameIdentifier,
+    };    
+});
+
 
 var app = builder.Build();
 Log.Information("Starting application...");
@@ -100,8 +137,10 @@ if (app.Environment.IsDevelopment())
     app.UseDeveloperExceptionPage();
     await app.InitializeDb(); 
 }
-app.UseHangfireDashboard("/hangfire");
-
+app.UseHangfireDashboard("/hangfire", new DashboardOptions
+{
+    Authorization = new[] { new HangfireAuthorizationFilter() }
+});
 // 📌 Zamanlanmış Görev 
 RecurringJob.AddOrUpdate<UserDeletionJob>(
     x => x.RunScheduledUserDeletion(),

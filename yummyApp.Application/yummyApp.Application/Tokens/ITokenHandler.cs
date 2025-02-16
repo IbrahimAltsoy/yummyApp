@@ -6,7 +6,8 @@ namespace yummyApp.Application.Tokens
 {
     public interface ITokenHandler
     {
-        Token CreateAccessToken(int second, AppUser user);
+        //Token CreateAccessToken(int second, AppUser user);
+        Task<Token> CreateAccessTokenAsync(int second, AppUser user);
         string CreateRefreshToken();
     }
 }

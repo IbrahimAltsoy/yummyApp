@@ -1,5 +1,6 @@
 ﻿using Hangfire;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using yummyApp.Application.BackGroundJobs;
@@ -21,11 +22,10 @@ namespace yummyApp.Api.Controllers
         {
             _mediator = mediator;
         }
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> Get([FromQuery] GetAllUserQueryRequest request)
         {
-            BackgroundJob.Enqueue<UserDeletionJob>(x => x.RunScheduledUserDeletion());
-
             GetAllUserQueryResponse response = await _mediator.Send(request);
             return Ok(response);
 

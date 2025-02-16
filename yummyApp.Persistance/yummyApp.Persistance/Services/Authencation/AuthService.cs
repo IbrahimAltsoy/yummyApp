@@ -69,7 +69,8 @@ namespace yummyApp.Persistance.Services.Authencation
             if (result.Succeeded)
             {
 
-                Token token = _tokenHandler.CreateAccessToken(accessTokenLifeTime, user);
+                //Token token = _tokenHandler.CreateAccessToken(accessTokenLifeTime, user);
+                Token token =await  _tokenHandler.CreateAccessTokenAsync(accessTokenLifeTime, user);
                 await _userService.UpdateRefreshToken(token.RefreshToken, user, token.Expiration, 5 * 60);
                 
                 return token;
@@ -83,7 +84,8 @@ namespace yummyApp.Persistance.Services.Authencation
             AppUser? user = await _userManager.Users.FirstOrDefaultAsync(u => u.RefreshToken == refreshToken);
             if (user != null && user?.RefreshTokenEndDate > DateTime.UtcNow)
             {
-                Token token = _tokenHandler.CreateAccessToken(15 * 60, user);
+                //Token token = _tokenHandler.CreateAccessToken(15 * 60, user);
+                Token token =await _tokenHandler.CreateAccessTokenAsync(15 * 60, user);
                 await _userService.UpdateRefreshToken(token.RefreshToken, user, token.Expiration, 5 * 60);
                 return token;
             }
@@ -146,7 +148,8 @@ namespace yummyApp.Persistance.Services.Authencation
             if (result)
             {
                 await _userManager.AddLoginAsync(user, info);
-                Token token = _tokenHandler.CreateAccessToken(15 * 60, user);
+                //Token token = _tokenHandler.CreateAccessToken(15 * 60, user);
+                Token token =await _tokenHandler.CreateAccessTokenAsync(15 * 60, user);
                 await _userService.UpdateRefreshToken(token.RefreshToken, user, token.Expiration, 5 * 60);
                 return token;
 

@@ -7,6 +7,7 @@ using yummyApp.Domain.Identity;
 
 namespace yummyApp.Api.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class TestController : ControllerBase
@@ -38,8 +39,7 @@ namespace yummyApp.Api.Controllers
         [AllowAnonymous]
         [HttpPost("addRoles")]
         public async Task<IActionResult> AddRoles()
-        {
-            var sonuc = 5;
+        {            
             var roles = new List<string> { "User", "TemporaryUser", "Admin", "Manager" }; // Eklemek istediğin roller
 
             foreach (var role in roles)

@@ -11,10 +11,9 @@ namespace yummyApp.Api
     {
         public static IServiceCollection AddWebApiServices(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddControllers();
-            services.AddEndpointsApiExplorer();
-            services.AddSwaggerGen(); 
-            //services.AddHttpContextAccessor();
+            //services.AddControllers();
+            //services.AddEndpointsApiExplorer();
+            //services.AddSwaggerGen(); 
             services.AddScoped<IUser, CurrentUser>();
             services.AddExceptionHandler<GlobalExceptionHandler>();
 
