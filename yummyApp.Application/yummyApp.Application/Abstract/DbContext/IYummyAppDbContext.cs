@@ -6,16 +6,16 @@ namespace yummyApp.Application.Abstract.DbContext
 {
     public interface IYummyAppDbContext
     {
-        DbSet<Business> Businesses { get; }
-        DbSet<Comment> Comments { get; }
-        DbSet<Friendship> Friendships { get; }
-        DbSet<Like> Likes { get; }
-        DbSet<Post> Posts { get; }
-        DbSet<Tag> Tags { get; }
-        DbSet<BusinessLocation> BusinessLocations { get; }
-        DbSet<PostLocation> PostLocations { get; }
-        DbSet<AppUser> AppUsers { get; }
-
+        DbSet<Business> Businesses { get; set; }
+        DbSet<Comment> Comments { get; set; }
+        DbSet<Friendship> Friendships { get; set; }
+        DbSet<Like> Likes { get; set; }
+        DbSet<Post> Posts { get; set; }
+        DbSet<Tag> Tags { get; set; }
+        DbSet<BusinessLocation> BusinessLocations { get; set; }
+        DbSet<PostLocation> PostLocations { get; set; }
+        DbSet<AppUser> AppUsers { get; set; }
+        DbSet<LogEntry> LogEntries { get; set; }
 
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     }

@@ -16,9 +16,10 @@ namespace yummyApp.Api.Infrastructure
 
         public GlobalExceptionHandler(IAppLogger logger, IConfiguration configuration)
         {
-            _logger = logger.CreatePerformanceLogger();
+            _logger = logger.CreateDatabaseLogger();
             _configuration = configuration;
         }
+        
         public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception ex, CancellationToken cancellationToken)
         {
             var exceptionMessage = ex.Message;
@@ -87,7 +88,13 @@ namespace yummyApp.Api.Infrastructure
                     Type = "https://tools.ietf.org/html/rfc7231#section-6.5.3"
                 });
 
-                var msg = $"[FORBIDDEN] Type: {exceptionType}, Message: {exceptionMessage}, Time: {DateTime.UtcNow}";
+                var msg = $"[FORBIDDEN] Type: {exceptionType}, Message: {exceptionMessage}, Time: {DateTime.UtcNow}";                
+                Console.WriteLine(msg); // Terminal veya Debug Console'a yazdır 
+                if (_logger == null)
+                {
+                    Console.WriteLine("Logger nesnesi null, CreateDatabaseLogger düzgün çalışmıyor!");
+                }
+
                 _logger.Error(msg);
 
                 return true;

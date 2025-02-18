@@ -14,28 +14,32 @@ using yummyApp.Domain.Identity;
 using Hangfire;
 using yummyApp.Application.BackGroundJobs;
 using yummyApp.Api.Filters;
+using Serilog.Events;
+using static yummyApp.Domain.Enums.PlaceCategories;
+using yummyApp.Api.Infrastructure;
+using yummyApp.Application.Abstract.DbContext;
+using yummyApp.Persistance.Seeders;
 
+
+
+var builder = WebApplication.CreateBuilder(args);
 #region Serilog Configuration
 Log.Logger = new LoggerConfiguration()
-    .Enrich.FromLogContext()
-    .MinimumLevel.Warning()
-    .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database.Command", Serilog.Events.LogEventLevel.Warning)
-    .MinimumLevel.Override("Microsoft.AspNetCore", Serilog.Events.LogEventLevel.Warning)
-    .WriteTo.Console()
-    .WriteTo.File(
-        "logs/yummyapp-log.txt",
-        rollingInterval: RollingInterval.Day,
-        fileSizeLimitBytes: 10 * 1024 * 1024,
-        retainedFileCountLimit: 5,
-        rollOnFileSizeLimit: true,
-        restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Warning)
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+    .Enrich.FromLogContext()    
+    .WriteTo.MSSqlServer(
+        connectionString: builder.Configuration.GetConnectionString("DefaultConnection"),
+        sinkOptions: new Serilog.Sinks.MSSqlServer.MSSqlServerSinkOptions
+        {
+            TableName = "LogEntries",
+            AutoCreateSqlTable = true // Eğer tablo yoksa otomatik oluştur
+        })
     .CreateLogger();
 #endregion
 
-var builder = WebApplication.CreateBuilder(args);
 builder.WebHost.UseUrls("http://0.0.0.0:7009"); // burası mobilden giriş yapabilmek için eklendi.
 builder.Host.UseSerilog();
-
+//builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllers();
 builder.Services.AddPersistanceServices(builder.Configuration);
@@ -126,16 +130,25 @@ builder.Services.AddAuthentication(options =>
         LifetimeValidator = (notBefore, expires, securityToken, validationParameters) =>
             expires != null ? expires > DateTime.UtcNow : false,
         NameClaimType = ClaimTypes.NameIdentifier,
-    };    
+    };
 });
 
 
 var app = builder.Build();
+//app.UseMiddleware<ExceptionMiddleware>();
+
+
 Log.Information("Starting application...");
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
-    await app.InitializeDb(); 
+    await app.InitializeDb();
+    using (var scope = app.Services.CreateScope())
+    {
+        var dbContext = scope.ServiceProvider.GetRequiredService<IYummyAppDbContext>();
+        var userSeeder = new UserSeeder();
+        await userSeeder.Seed(dbContext);
+    }
 }
 app.UseHangfireDashboard("/hangfire", new DashboardOptions
 {
@@ -151,11 +164,13 @@ app.UseHangfireServer();
 app.UseExceptionHandler("/Home/Error");
 //app.UseHttpsRedirection(); // burasının kapanma sebebi mobilden gelen istekleri kabul etsin diye kapatıldı.
 app.UseStaticFiles();
+app.UseSerilogRequestLogging(); // HTTP isteklerini logla
+
 app.UseRouting();
 app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseMiddleware<ExceptionMiddleware>();
+
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {

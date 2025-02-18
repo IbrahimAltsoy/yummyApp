@@ -1,4 +1,6 @@
 ﻿using Bogus;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using yummyApp.Application.Abstract.DbContext;
 using yummyApp.Domain.Enums;
 using yummyApp.Domain.Identity;
@@ -10,40 +12,28 @@ namespace yummyApp.Persistance.Seeders
     {
         public async Task Seed(IYummyAppDbContext context)
         {
-            //if (context.Users.Any()) return;
+            if (context.AppUsers.Any()) return;
+            var hasher = new PasswordHasher<AppUser>();
+            var adminRoleId = new Guid("12345678-1234-1234-1234-123456789012");
 
-            //var adminUser = new AppUser()
-            //{
-            //    //Username = "admin",
-            //    //Password ="Yummy123." ,/*AccountHelper.HashCreate("123qwe"),*/
-            //    //Email = "admin@localhost",
-            //    //ConfirmPassword = "Yummy123.",
-            //    //Roles = "Administrator",
-            //    Gender = Gender.Male,
-            //    Name = "Admin",
-            //    Surname= "Admin",
-            //    IsActive = true,
-            //    //ProfilePicture="string",
-            //    //PrivacySettings= true,
-            //    //NotificationPreferences=true,
+            
+            var adminUser = new AppUser()
+            {
+                UserName = "admin",
+                Name = "string",
+                Surname = "Değerli",
+                ActivationCode = "",
+                NormalizedUserName = "ADMIN",
+                Email = "admin@yummyapp.com",
+                NormalizedEmail = "ADMIN@YUMMYAPP.COM",
+                EmailConfirmed = true,
+                PasswordHash = hasher.HashPassword(null, "Admin123!"),  // 📌 Şifreyi hashliyoruz
+                SecurityStamp = "E51C5B6B-9E85-42AB-8A8C-B65A3D74A12D",
+                CreatedAt = new DateTime(2024, 2, 18, 12, 0, 0)  // 📌 Sabit tarih         
 
-            //};
-            //await context.Users.AddAsync(adminUser);
 
-            //var trSet = new Bogus.DataSets.Name(locale: "tr");
-            //var faker = new Faker<AppUser>()
-            //    .RuleFor(u => u.Name, (f, u) => f.Name.FirstName())
-            //    .RuleFor(s => s.Surname, (f, s) => f.Name.LastName())
-            //    .RuleFor(u => u.Username, (f, u) => f.Internet.UserName(u.Name, u.Surname))
-            //    .RuleFor(u => u.Email, (f, u) => f.Internet.Email(u.Name, u.Surname))
-            //    .RuleFor(u => u.Password, "Yummy123." /*AccountHelper.HashCreate("123qwe")*/)
-            //    //.RuleFor(u => u.Gender, f => f.PickRandom<Gender>())
-            //    //.RuleFor(u => u.ProfilePicture, f => f.Image.ToString())
-            //    .RuleFor(u => u.IsActive, f => f.Random.Bool());
-            //    //.RuleFor(u => u.NotificationPreferences, f => f.Random.Bool())
-            //    //.RuleFor(u => u.PrivacySettings, f => f.Random.Bool());
-            //var list = faker.Generate(100);
-            //await context.Users.AddRangeAsync(list);
+            };            
+            await context.AppUsers.AddAsync(adminUser);
 
             await context.SaveChangesAsync();
         }

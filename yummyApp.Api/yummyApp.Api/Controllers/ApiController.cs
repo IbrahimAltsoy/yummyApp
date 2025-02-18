@@ -1,9 +1,12 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
+using yummyApp.Application.Exceptions;
 using yummyApp.Application.Features.Apis.Queries.GetNearByPlaceDetail;
 using yummyApp.Application.Features.Apis.Queries.GetNearByPlaces;
 using yummyApp.Application.Services.GoogleApi;
+using yummyApp.Persistance.Services.Logging;
 
 namespace yummyApp.Api.Controllers
 {
@@ -13,11 +16,15 @@ namespace yummyApp.Api.Controllers
     {
         readonly IGooglePlacesService _googlePlacesService;
         readonly IMediator _mediator;
+        
+        readonly IConfiguration _configuration;
 
-        public ApiController(IGooglePlacesService googlePlacesService, IMediator mediator)
+        public ApiController(IGooglePlacesService googlePlacesService, IMediator mediator, IConfiguration configuration)
         {
             _googlePlacesService = googlePlacesService;
             _mediator = mediator;
+           
+            _configuration = configuration;
         }
 
         [HttpGet("get-nearby-places")]
@@ -35,5 +42,30 @@ namespace yummyApp.Api.Controllers
 
             return Ok(data);
         }
+        [HttpGet("test-log")]
+        public IActionResult TestLog()
+        {
+            throw new Exception("Bu test hatasıdır! Serilog logluyor mu kontrol et.");
+        }
+        [HttpGet("test-db-log")]
+        public IActionResult TestDbLog()
+        {
+            throw new Exception("");
+        }
+        [HttpPost("test-email-error")]
+        public IActionResult TestEmailError()
+        {
+            try
+            {
+                throw new ForbiddenAccessException();
+            }
+            catch (Exception ex)
+            {
+                
+                throw; // Hata tekrar fırlatılır
+            }
+        }
+
+
     }
 }

@@ -5,7 +5,7 @@ VisualStudioVersion = 17.8.34322.80
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{0D69AC6A-7F32-4D7B-9A8E-224695F5F9DC}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Persistance", "Persistance", "{B5B2A106-4893-4897-A4DD-FD197D2B9492}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "yummyApp.Api", "yummyApp.Api", "{B5B2A106-4893-4897-A4DD-FD197D2B9492}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{CA038AB0-2AE9-4F6F-9E93-48B6FB2D812A}"
 EndProject

@@ -40,7 +40,7 @@ namespace yummyApp.Persistance
 
             services.AddDbContext<YummyAppDbContext>((sp, options) =>
             {
-                options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
+                options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>().ToArray());
                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
 
             });

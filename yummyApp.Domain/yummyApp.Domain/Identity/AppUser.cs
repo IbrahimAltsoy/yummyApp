@@ -20,16 +20,16 @@ namespace yummyApp.Domain.Identity
         public string? ActivationCode { get; set; }
         
 
-        public ICollection<UserRating> Ratings { get; set; }
-        public ICollection<UserLocation> Locations { get; set; }
-        public ICollection<UserReview> Reviews { get; set; }
-        public ICollection<Comment> Comments { get; set; }
-        public ICollection<Friendship> Friendships { get; set; }
-        public ICollection<Post> Posts { get; set; }
-        public ICollection<Like> Likes { get; set; }
-        public ICollection<Message> SentMessages { get; set; }
-        public ICollection<Message> ReceivedMessages { get; set; }
-        public ICollection<BusinessReview> BusinessReviews { get; set; }
+        public ICollection<UserRating>? Ratings { get; set; }
+        public ICollection<UserLocation>? Locations { get; set; }
+        public ICollection<UserReview>? Reviews { get; set; }
+        public ICollection<Comment>? Comments { get; set; }
+        public ICollection<Friendship>? Friendships { get; set; }
+        public ICollection<Post>? Posts { get; set; }
+        public ICollection<Like>? Likes { get; set; }
+        public ICollection<Message>? SentMessages { get; set; }
+        public ICollection<Message>? ReceivedMessages { get; set; }
+        public ICollection<BusinessReview>? BusinessReviews { get; set; }
         
         public DateTime CreatedAt { get; set; }
         public string? CreatedBy { get; set; }
