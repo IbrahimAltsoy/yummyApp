@@ -15,10 +15,10 @@ using Hangfire;
 using yummyApp.Application.BackGroundJobs;
 using yummyApp.Api.Filters;
 using Serilog.Events;
-using static yummyApp.Domain.Enums.PlaceCategories;
 using yummyApp.Api.Infrastructure;
 using yummyApp.Application.Abstract.DbContext;
 using yummyApp.Persistance.Seeders;
+using Microsoft.AspNetCore.Diagnostics;
 
 
 
@@ -32,14 +32,17 @@ Log.Logger = new LoggerConfiguration()
         sinkOptions: new Serilog.Sinks.MSSqlServer.MSSqlServerSinkOptions
         {
             TableName = "LogEntries",
-            AutoCreateSqlTable = true // Eğer tablo yoksa otomatik oluştur
+            AutoCreateSqlTable = false // Eğer tablo yoksa otomatik oluştur
         })
     .CreateLogger();
 #endregion
 
 builder.WebHost.UseUrls("http://0.0.0.0:7009"); // burası mobilden giriş yapabilmek için eklendi.
 builder.Host.UseSerilog();
-//builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+
+
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllers();
 builder.Services.AddPersistanceServices(builder.Configuration);
@@ -135,13 +138,13 @@ builder.Services.AddAuthentication(options =>
 
 
 var app = builder.Build();
-//app.UseMiddleware<ExceptionMiddleware>();
+app.UseExceptionHandler(_ => { });
 
 
 Log.Information("Starting application...");
 if (app.Environment.IsDevelopment())
 {
-    app.UseDeveloperExceptionPage();
+    //app.UseDeveloperExceptionPage();
     await app.InitializeDb();
     using (var scope = app.Services.CreateScope())
     {
@@ -161,7 +164,7 @@ RecurringJob.AddOrUpdate<UserDeletionJob>(
 );
 app.UseHangfireServer();
 
-app.UseExceptionHandler("/Home/Error");
+
 //app.UseHttpsRedirection(); // burasının kapanma sebebi mobilden gelen istekleri kabul etsin diye kapatıldı.
 app.UseStaticFiles();
 app.UseSerilogRequestLogging(); // HTTP isteklerini logla
@@ -180,5 +183,4 @@ app.UseSwaggerUI(c =>
 
 app.MapControllers();
 app.MapFallbackToFile("/app/index.html");
-
 app.Run();

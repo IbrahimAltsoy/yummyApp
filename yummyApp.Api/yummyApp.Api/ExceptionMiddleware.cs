@@ -1,49 +1,68 @@
-﻿using System.Net;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
+using System.Net;
 using System.Text.Json;
+using yummyApp.Application.Exceptions;
 using yummyApp.Application.Exceptions.AuthExceptions;
-
+using yummyApp.Application.Services.Logger;
+using ILogger = Serilog.ILogger;
 namespace yummyApp.Api
 {
     //public class ExceptionMiddleware
     //{
     //    private readonly RequestDelegate _next;
-    //    private readonly ILogger<ExceptionMiddleware> _logger;
+    //    private readonly ILogger _logger;
+    //    private readonly IWebHostEnvironment _environment;
 
-    //    public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger)
+    //    public ExceptionMiddleware(RequestDelegate next, IAppLogger appLogger, IWebHostEnvironment environment)
     //    {
     //        _next = next;
-    //        _logger = logger;
+    //        _logger = appLogger.CreateDatabaseLogger();
+    //        _environment = environment ?? throw new ArgumentNullException(nameof(environment));
     //    }
 
-    //    public async Task InvokeAsync(HttpContext httpContext)
+    //    public async Task InvokeAsync(HttpContext context)
     //    {
+    //        Console.WriteLine("⚠️ Exception Middleware Çalıştı!");
+
     //        try
     //        {
-    //            await _next(httpContext);
+    //            await _next(context);               
     //        }
     //        catch (Exception ex)
     //        {
-    //            _logger.LogError($"Hata oluştu: {ex.Message}");
-    //            await HandleExceptionAsync(httpContext, ex);
+    //            _logger.Error(ex, "An unhandled exception has occurred.");
+    //            await HandleExceptionAsync(context, ex);
     //        }
     //    }
 
-    //    private static Task HandleExceptionAsync(HttpContext context, Exception exception)
+    //    private async Task HandleExceptionAsync(HttpContext context, Exception ex)
     //    {
     //        context.Response.ContentType = "application/json";
-    //        context.Response.StatusCode = exception switch
+    //        context.Response.StatusCode = ex switch
     //        {
-    //            UserEmailVerifyCheckException => (int)HttpStatusCode.BadRequest, 
-    //            _ => (int)HttpStatusCode.InternalServerError
+    //            ValidationException => StatusCodes.Status400BadRequest,
+    //            NotFoundException => StatusCodes.Status404NotFound,
+    //            UnauthorizedAccessException => StatusCodes.Status401Unauthorized,
+    //            ForbiddenAccessException => StatusCodes.Status403Forbidden,
+    //            SqlException => StatusCodes.Status500InternalServerError,
+    //            _ => StatusCodes.Status500InternalServerError
     //        };
 
-    //        var response = new
+    //        var response = new ProblemDetails
     //        {
-    //            statusCode = context.Response.StatusCode,
-    //            message = exception.Message
+    //            Status = context.Response.StatusCode,
+    //            Title = ex.GetType().Name,
+    //            Detail = _environment.IsDevelopment() ? ex.Message : "An error occurred. Please try again later.",
+    //            Instance = context.Request.Path
     //        };
 
-    //        return context.Response.WriteAsync(JsonSerializer.Serialize(response));
+    //        if (_environment.IsDevelopment())
+    //        {
+    //            response.Extensions.Add("StackTrace", ex.StackTrace);
+    //        }
+
+    //        await context.Response.WriteAsJsonAsync(response);
     //    }
     //}
 }

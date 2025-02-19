@@ -15,8 +15,8 @@ namespace yummyApp.Persistance.Seeders
             if (context.AppUsers.Any()) return;
             var hasher = new PasswordHasher<AppUser>();
             var adminRoleId = new Guid("12345678-1234-1234-1234-123456789012");
+            //5288d73b-e2dd-4c0f-ba70-08dd5055ed1e
 
-            
             var adminUser = new AppUser()
             {
                 UserName = "admin",

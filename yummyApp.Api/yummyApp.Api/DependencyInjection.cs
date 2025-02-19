@@ -15,7 +15,7 @@ namespace yummyApp.Api
             //services.AddEndpointsApiExplorer();
             //services.AddSwaggerGen(); 
             services.AddScoped<IUser, CurrentUser>();
-            services.AddExceptionHandler<GlobalExceptionHandler>();
+            //services.AddExceptionHandler<GlobalExceptionHandler>();
 
             
             services.AddScoped<JwtAccountService>();

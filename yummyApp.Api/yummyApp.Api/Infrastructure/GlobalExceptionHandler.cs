@@ -1,141 +1,82 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
+using Microsoft.AspNetCore.Diagnostics;
 using yummyApp.Application.Exceptions;
 using yummyApp.Application.Services.Logger;
 using Serilog;
 using ILogger = Serilog.ILogger;
-using Microsoft.AspNetCore.Diagnostics;
 
 
 namespace yummyApp.Api.Infrastructure
 {
-    public class GlobalExceptionHandler : IExceptionHandler
-    {
-        readonly ILogger _logger;
-        readonly IConfiguration _configuration;
-
-        public GlobalExceptionHandler(IAppLogger logger, IConfiguration configuration)
+        public class GlobalExceptionHandler : IExceptionHandler
         {
-            _logger = logger.CreateDatabaseLogger();
-            _configuration = configuration;
-        }
-        
-        public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception ex, CancellationToken cancellationToken)
+            private readonly ILogger _logger;
+            private readonly IConfiguration _configuration;
+            private readonly IWebHostEnvironment _environment;
+
+            private static readonly Dictionary<Type, int> ExceptionStatusCodes = new()
         {
-            var exceptionMessage = ex.Message;
-            var exceptionType = ex.GetType();
+            { typeof(ValidationException), StatusCodes.Status400BadRequest },
+            { typeof(NotFoundException), StatusCodes.Status404NotFound },
+            { typeof(UnauthorizedAccessException), StatusCodes.Status401Unauthorized },
+            { typeof(ForbiddenAccessException), StatusCodes.Status403Forbidden },
+            { typeof(ServiceException), StatusCodes.Status500InternalServerError },
+            { typeof(SqlException), StatusCodes.Status500InternalServerError }
+        };
 
-            if (exceptionType == typeof(ValidationException))
+            public GlobalExceptionHandler(IAppLogger appLogger, IConfiguration configuration, IWebHostEnvironment environment)
             {
-                var exception = (ValidationException)ex;
-                httpContext.Response.StatusCode = (int)StatusCodes.Status400BadRequest;
-
-                await httpContext.Response.WriteAsJsonAsync(new ValidationProblemDetails(exception.Errors)
-                {
-                    Status = StatusCodes.Status400BadRequest,
-                    Title = "Validation Error",
-                    Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1"
-                });
-
-                _logger.Error($"[VALIDATIN ERROR] Type: {exceptionType}, Message: {exceptionMessage}, Time: {DateTime.UtcNow}");
-
-                // ASP.NET'in standart DevelopeExceptionPage ya da ExceptionHandler'ını kullanmaz
-                return true;
+                _logger = appLogger?.CreateDatabaseLogger() ?? Log.Logger;
+                _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+                _environment = environment ?? throw new ArgumentNullException(nameof(environment));
             }
 
-            else if (exceptionType == typeof(NotFoundException))
+            public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception ex, CancellationToken cancellationToken)
             {
-                var exception = (NotFoundException)ex;
-                httpContext.Response.StatusCode = StatusCodes.Status404NotFound;
-
-                await httpContext.Response.WriteAsJsonAsync(new ProblemDetails
+                if (_environment.IsDevelopment())
                 {
-                    Status = StatusCodes.Status404NotFound,
-                    Type = "https://tools.ietf.org/html/rfc7231#section-6.5.4",
-                    Title = "The specified resource was not found.",
-                    Detail = exception.Message
-                });
-
-                _logger.Error($"[NOT FOUND] Type: {exceptionType}, Message: {exceptionMessage}, Time: {DateTime.UtcNow}");
-
-                return true;
-            }
-
-            else if (exceptionType == typeof(UnauthorizedAccessException))
-            {
-                httpContext.Response.StatusCode = StatusCodes.Status401Unauthorized;
-
-                await httpContext.Response.WriteAsJsonAsync(new ProblemDetails
-                {
-                    Status = StatusCodes.Status401Unauthorized,
-                    Title = "Unauthorized",
-                    Type = "https://tools.ietf.org/html/rfc7235#section-3.1"
-                });
-
-                _logger.Error($"[UNAUTHORIZED] Type: {exceptionType}, Message: {exceptionMessage}, Time: {DateTime.UtcNow}");
-
-                return true;
-            }
-
-            else if (exceptionType == typeof(ForbiddenAccessException))
-            {
-                httpContext.Response.StatusCode = StatusCodes.Status403Forbidden;
-
-                await httpContext.Response.WriteAsJsonAsync(new ProblemDetails
-                {
-                    Status = StatusCodes.Status403Forbidden,
-                    Title = "Forbidden",
-                    Type = "https://tools.ietf.org/html/rfc7231#section-6.5.3"
-                });
-
-                var msg = $"[FORBIDDEN] Type: {exceptionType}, Message: {exceptionMessage}, Time: {DateTime.UtcNow}";                
-                Console.WriteLine(msg); // Terminal veya Debug Console'a yazdır 
-                if (_logger == null)
-                {
-                    Console.WriteLine("Logger nesnesi null, CreateDatabaseLogger düzgün çalışmıyor!");
+                    Console.WriteLine("⚠️ GlobalExceptionHandler devreye girdi!");
                 }
 
-                _logger.Error(msg);
+                var exceptionType = ex.GetType();
+                var statusCode = ExceptionStatusCodes.TryGetValue(exceptionType, out var code) ? code : StatusCodes.Status500InternalServerError;
+
+                var problemDetails = new ProblemDetails
+                {
+                    Status = statusCode,
+                    Title = GetTitleForStatusCode(statusCode),
+                    Type = $"https://tools.ietf.org/html/rfc7231#section-{statusCode}",
+                    Detail = _environment.IsDevelopment() ? ex.Message : "An unexpected error occurred. Please try again later.",
+                    Instance = httpContext.Request.Path
+                };
+
+                if (_environment.IsDevelopment())
+                {
+                    problemDetails.Extensions["StackTrace"] = ex.StackTrace;
+                    problemDetails.Extensions["InnerException"] = ex.InnerException?.Message;
+                }
+
+                httpContext.Response.StatusCode = statusCode;
+                await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
+
+                _logger.Error(ex, "[{StatusCode}] Type: {ExceptionType}, Message: {ExceptionMessage}, Time: {DateTimeUtcNow}, StackTrace: {StackTrace}",
+                    statusCode, exceptionType, ex.Message, DateTime.UtcNow, ex.StackTrace);
 
                 return true;
             }
 
-            else if (exceptionType == typeof(SqlException))
+            private static string GetTitleForStatusCode(int statusCode) => statusCode switch
             {
-                httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
-
-                await httpContext.Response.WriteAsJsonAsync(new ProblemDetails
-                {
-                    Status = StatusCodes.Status500InternalServerError,
-                    Title = "Db Error",
-                    Detail = ex.Message,
-                    Type = "https://tools.ietf.org/html/rfc7231#section-6.5.3"
-                });
-
-                var msg = $"[DB ERROR] Type: {exceptionType}, Message: {exceptionMessage}, Time: {DateTime.UtcNow}";
-                Log.Error(msg);
-                _logger.Error(msg);
-
-                return true;
-            }
-
-            else
-            {
-                httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
-
-                await httpContext.Response.WriteAsJsonAsync(new ProblemDetails
-                {
-                    Status = StatusCodes.Status500InternalServerError,
-                    Title = "Error",
-                    Detail = ex.Message
-                });
-
-                _logger.Error($"[ERROR] Type: {exceptionType}, Message: {exceptionMessage}, Time: {DateTime.UtcNow}");
-
-                // Return false to continue with the default behavior
-                // - or - return true to signal that this exception is handled
-                return false;
-            }
+                StatusCodes.Status400BadRequest => "Validation Error",
+                StatusCodes.Status404NotFound => "Resource Not Found",
+                StatusCodes.Status401Unauthorized => "Unauthorized",
+                StatusCodes.Status403Forbidden => "Forbidden",
+                StatusCodes.Status500InternalServerError => "Internal Server Error",
+                _ => "Error"
+            };
         }
-    }
-}
+ }
+
+
+

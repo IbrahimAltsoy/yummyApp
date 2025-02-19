@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using MediatR;
+using yummyApp.Application.Exceptions;
 using yummyApp.Application.Repositories.Repository;
 
 namespace yummyApp.Application.Features.Businesses.Queries.GetAll
@@ -16,7 +17,7 @@ namespace yummyApp.Application.Features.Businesses.Queries.GetAll
         }
 
         public async Task<IList<GetAllBusinessQueryResponse>> Handle(GetAllBusinessQueryRequest request, CancellationToken cancellationToken)
-        {
+        {            
             var list = await _businessRepository.GetListAsync();
             var mappedList = _mapper.Map<IList<GetAllBusinessQueryResponse>>(list);
             return mappedList;

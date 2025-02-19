@@ -1,4 +1,5 @@
 ﻿using Google;
+using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -6,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using yummyApp.Application.Abstract.Common;
 using yummyApp.Application.Abstract.DbContext;
+using yummyApp.Application.Behaviors;
 using yummyApp.Application.Repositories;
 using yummyApp.Application.Repositories.Repository;
 using yummyApp.Application.Services.Account;
@@ -81,6 +83,8 @@ namespace yummyApp.Persistance
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddSingleton<IAppLogger, LogManager>();
+            
+
             return services;
 
         }

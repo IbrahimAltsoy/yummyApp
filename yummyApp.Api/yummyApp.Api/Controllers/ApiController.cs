@@ -42,28 +42,22 @@ namespace yummyApp.Api.Controllers
 
             return Ok(data);
         }
-        [HttpGet("test-log")]
-        public IActionResult TestLog()
+        [HttpGet("throw-validation-exception")]
+        public async Task<IActionResult> ThrowValidationException()
         {
-            throw new Exception("Bu test hatasıdır! Serilog logluyor mu kontrol et.");
+            throw new ValidationException();
         }
-        [HttpGet("test-db-log")]
-        public IActionResult TestDbLog()
+
+        [HttpGet("throw-not-found-exception")]
+        public async Task<IActionResult> ThrowNotFoundException()
         {
-            throw new Exception("");
+            throw new NotFoundException("kullanıcı", "Bulunmadı");
         }
-        [HttpPost("test-email-error")]
-        public IActionResult TestEmailError()
+
+        [HttpGet("throw-generic-exception")]
+        public async Task<IActionResult> ThrowGenericException()
         {
-            try
-            {
-                throw new ForbiddenAccessException();
-            }
-            catch (Exception ex)
-            {
-                
-                throw; // Hata tekrar fırlatılır
-            }
+            throw new Exception("This is a generic error.");
         }
 
 
