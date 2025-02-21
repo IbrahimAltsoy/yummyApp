@@ -37,20 +37,20 @@ namespace yummyApp.Api.Controllers
             return Ok(response);
         }
         [HttpPost]
-        public async Task<IActionResult> Post(CreateUserCommandRequest request)
+        public async Task<IActionResult> Post([FromBody]CreateUserCommandRequest request)
         {
             CreateUserCommandResponse response = await _mediator.Send(request);
             return Ok(response);
         }
         [HttpPut]
-        public async Task<IActionResult> Update(UpdateUserCommandRequest request)
+        public async Task<IActionResult> Update([FromBody]UpdateUserCommandRequest request)
         {
             UpdateUserCommandResponse response = await _mediator.Send(request);
 
             return Ok("Güncelleme başarılı bir şekilde yapılmıştır.");
         }
         [HttpDelete]
-        public async Task<IActionResult> Delete(DeleteUserCommandRequest request)
+        public async Task<IActionResult> Delete([FromBody]DeleteUserCommandRequest request)
         {
             DeleteUserCommandResponse response = await _mediator.Send(request);
             return Ok(response);

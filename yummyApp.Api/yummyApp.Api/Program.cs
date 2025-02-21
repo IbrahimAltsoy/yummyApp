@@ -21,45 +21,35 @@ using yummyApp.Persistance.Seeders;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.Data.SqlClient;
 using Serilog.Sinks.MSSqlServer;
-
 using System.Data;
 using System.Data.SqlClient;
-using Microsoft.Extensions.DependencyInjection; // Eğer eski SqlClient kullanıyorsan
-using Serilog;
-using Serilog.Events;
-using Serilog.Sinks.MSSqlServer;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.TestHost;
+
 
 
 var builder = WebApplication.CreateBuilder(args);
 #region Serilog Configuration
-var columnOptions = new ColumnOptions(); // Varsayılan sütunları kullan
-
-// 🔹 Varsayılan ID sütununu int olarak bırak (Ekstra tanımlama yapmamıza gerek yok)
-
-// 🔹 Timestamp sütununu varsayılan olarak ayarla
+var columnOptions = new ColumnOptions();
 columnOptions.TimeStamp.ColumnName = "TimeStamp";
 columnOptions.TimeStamp.DataType = SqlDbType.DateTimeOffset;
 columnOptions.TimeStamp.NonClusteredIndex = true;
-
-// 🔹 Gereksiz varsayılan sütunları kaldır
 columnOptions.Store.Remove(StandardColumn.Properties);
 columnOptions.Store.Remove(StandardColumn.MessageTemplate);
-
-// **Serilog Konfigürasyonu**
 Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Override("Microsoft", LogEventLevel.Error)  // ❗ ASP.NET Core'un Info loglarını engelle
-    .MinimumLevel.Override("System", LogEventLevel.Error)  // ❗ Sistem loglarını da Error seviyesine çek
-    .MinimumLevel.Error()  // ❗ SADECE "Error" ve "Critical" logları MSSQL'e yazılacak!
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Error)  
+    .MinimumLevel.Override("System", LogEventLevel.Error)
+    .MinimumLevel.Error()
     .Enrich.FromLogContext()
     .WriteTo.MSSqlServer(
         connectionString: builder.Configuration.GetConnectionString("DefaultConnection"),
         sinkOptions: new MSSqlServerSinkOptions
         {
             TableName = "LogEntries",
-            AutoCreateSqlTable = true,  // ✅ Tabloyu otomatik oluştur
-            SchemaName = "dbo"  // Varsayılan şema kullanılacak
+            AutoCreateSqlTable = true,
+            SchemaName = "dbo"
         },
-        columnOptions: columnOptions // ✅ Varsayılan şemayı kullan
+        columnOptions: columnOptions 
     )
     .CreateLogger();
 
@@ -68,9 +58,8 @@ Log.Logger = new LoggerConfiguration()
 
 builder.WebHost.UseUrls("http://0.0.0.0:7009"); // burası mobilden giriş yapabilmek için eklendi.
 builder.Host.UseSerilog();
-
+#region Depenejcy Enjection
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
-
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllers();
 builder.Services.AddPersistanceServices(builder.Configuration);
@@ -78,6 +67,15 @@ builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices();
 builder.Services.AddHttpClient();
 builder.Services.AddWebApiServices(builder.Configuration);
+#endregion
+#region Test için eklendi
+if (builder.Environment.EnvironmentName == "Testing")
+{
+    //builder.WebHost.UseTestServer();
+}
+#endregion
+
+#region Cors yapılanamsı
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", builder =>
@@ -87,6 +85,7 @@ builder.Services.AddCors(options =>
                .AllowAnyHeader();
     });
 });
+#endregion
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -127,6 +126,7 @@ builder.Services.AddIdentityCore<AppUser>(options =>
     .AddEntityFrameworkStores<YummyAppDbContext>()
     .AddDefaultTokenProviders(); // Şifre sıfırlama ve e-posta doğrulama için gerekli
 //Hangfire işlemleri için
+#region Hangfire yapılanması
 builder.Services.AddHangfire(config =>
     config.SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
         .UseSimpleAssemblyNameTypeSerializer()
@@ -134,12 +134,13 @@ builder.Services.AddHangfire(config =>
         .UseSqlServerStorage(builder.Configuration.GetConnectionString("DefaultConnection")) 
 );
 builder.Services.AddHangfireServer();
+#endregion
 // Şifre sıfırlama token süresini uzat
 builder.Services.Configure<DataProtectionTokenProviderOptions>(options =>
 {
     options.TokenLifespan = TimeSpan.FromHours(24); // Şifre sıfırlama token süresi 3 saat
 });
-
+#region Jwt yapılandırması
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -164,12 +165,12 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-
+#endregion
 var app = builder.Build();
 app.UseExceptionHandler(_ => { });
 
 
-Log.Information("Starting application...");
+//Log.Information("Starting application...");
 if (app.Environment.IsDevelopment())
 {
     //app.UseDeveloperExceptionPage();
