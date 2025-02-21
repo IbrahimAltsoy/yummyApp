@@ -19,27 +19,55 @@ using yummyApp.Api.Infrastructure;
 using yummyApp.Application.Abstract.DbContext;
 using yummyApp.Persistance.Seeders;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.Data.SqlClient;
+using Serilog.Sinks.MSSqlServer;
 
+using System.Data;
+using System.Data.SqlClient;
+using Microsoft.Extensions.DependencyInjection; // Eğer eski SqlClient kullanıyorsan
+using Serilog;
+using Serilog.Events;
+using Serilog.Sinks.MSSqlServer;
 
 
 var builder = WebApplication.CreateBuilder(args);
 #region Serilog Configuration
+var columnOptions = new ColumnOptions(); // Varsayılan sütunları kullan
+
+// 🔹 Varsayılan ID sütununu int olarak bırak (Ekstra tanımlama yapmamıza gerek yok)
+
+// 🔹 Timestamp sütununu varsayılan olarak ayarla
+columnOptions.TimeStamp.ColumnName = "TimeStamp";
+columnOptions.TimeStamp.DataType = SqlDbType.DateTimeOffset;
+columnOptions.TimeStamp.NonClusteredIndex = true;
+
+// 🔹 Gereksiz varsayılan sütunları kaldır
+columnOptions.Store.Remove(StandardColumn.Properties);
+columnOptions.Store.Remove(StandardColumn.MessageTemplate);
+
+// **Serilog Konfigürasyonu**
 Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
-    .Enrich.FromLogContext()    
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Error)  // ❗ ASP.NET Core'un Info loglarını engelle
+    .MinimumLevel.Override("System", LogEventLevel.Error)  // ❗ Sistem loglarını da Error seviyesine çek
+    .MinimumLevel.Error()  // ❗ SADECE "Error" ve "Critical" logları MSSQL'e yazılacak!
+    .Enrich.FromLogContext()
     .WriteTo.MSSqlServer(
         connectionString: builder.Configuration.GetConnectionString("DefaultConnection"),
-        sinkOptions: new Serilog.Sinks.MSSqlServer.MSSqlServerSinkOptions
+        sinkOptions: new MSSqlServerSinkOptions
         {
             TableName = "LogEntries",
-            AutoCreateSqlTable = false // Eğer tablo yoksa otomatik oluştur
-        })
+            AutoCreateSqlTable = true,  // ✅ Tabloyu otomatik oluştur
+            SchemaName = "dbo"  // Varsayılan şema kullanılacak
+        },
+        columnOptions: columnOptions // ✅ Varsayılan şemayı kullan
+    )
     .CreateLogger();
+
 #endregion
+
 
 builder.WebHost.UseUrls("http://0.0.0.0:7009"); // burası mobilden giriş yapabilmek için eklendi.
 builder.Host.UseSerilog();
-
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 

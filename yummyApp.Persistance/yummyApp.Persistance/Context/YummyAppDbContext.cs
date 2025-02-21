@@ -37,7 +37,7 @@ public class YummyAppDbContext : IdentityDbContext<AppUser, UserRole, Guid>, IYu
     public DbSet<Media> Medias { get; set; }
     public DbSet<BusinessLocation> BusinessLocations { get; set; }
     public DbSet<PostLocation> PostLocations { get; set; }
-    public DbSet<LogEntry> LogEntries { get; set; }
+    //public DbSet<LogEntry> LogEntries { get; set; }
 
     public DbSet<AppUser> AppUsers { get; set; }
 

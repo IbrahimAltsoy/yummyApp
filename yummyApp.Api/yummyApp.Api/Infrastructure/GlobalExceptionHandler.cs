@@ -5,13 +5,15 @@ using yummyApp.Application.Exceptions;
 using yummyApp.Application.Services.Logger;
 using Serilog;
 using ILogger = Serilog.ILogger;
+using System;
+using yummyApp.Domain.Entities;
 
 
 namespace yummyApp.Api.Infrastructure
 {
         public class GlobalExceptionHandler : IExceptionHandler
         {
-            private readonly ILogger _logger;
+            private readonly IAppLogger _logger;
             private readonly IConfiguration _configuration;
             private readonly IWebHostEnvironment _environment;
 
@@ -26,15 +28,15 @@ namespace yummyApp.Api.Infrastructure
         };
 
             public GlobalExceptionHandler(IAppLogger appLogger, IConfiguration configuration, IWebHostEnvironment environment)
-            {
-                _logger = appLogger?.CreateDatabaseLogger() ?? Log.Logger;
+        {
+            _logger = appLogger;
                 _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
                 _environment = environment ?? throw new ArgumentNullException(nameof(environment));
             }
 
             public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception ex, CancellationToken cancellationToken)
-            {
-                if (_environment.IsDevelopment())
+        {         
+            if (_environment.IsDevelopment())
                 {
                     Console.WriteLine("⚠️ GlobalExceptionHandler devreye girdi!");
                 }
@@ -59,9 +61,9 @@ namespace yummyApp.Api.Infrastructure
 
                 httpContext.Response.StatusCode = statusCode;
                 await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
-
-                _logger.Error(ex, "[{StatusCode}] Type: {ExceptionType}, Message: {ExceptionMessage}, Time: {DateTimeUtcNow}, StackTrace: {StackTrace}",
-                    statusCode, exceptionType, ex.Message, DateTime.UtcNow, ex.StackTrace);
+         await _logger!.LogError("[{StatusCode}] Type: {ExceptionType}, Message: {ExceptionMessage}, Time: {DateTimeUtcNow}, StackTrace: {StackTrace}"
+                  );
+           
 
                 return true;
             }

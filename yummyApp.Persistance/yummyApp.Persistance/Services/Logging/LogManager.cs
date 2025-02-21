@@ -1,77 +1,71 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Serilog;
+using System;
 using System.Data;
 using yummyApp.Application.Services.Logger;
 
 namespace yummyApp.Persistance.Services.Logging
-{ 
+{
     public class LogManager : IAppLogger
     {
-        readonly IConfiguration _configuration;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ILogger _logger;
 
-        public LogManager(IConfiguration configuration)
+        public LogManager(IHttpContextAccessor httpContextAccessor)
         {
-            _configuration = configuration;
+            _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
+            _logger = Log.Logger;
         }
 
-        //public ILogger CreatePerformanceLogger()
-        //{
-        //    return new LoggerConfiguration()
-        //        .Enrich.FromLogContext()
-        //        .MinimumLevel.Debug()
-        //        .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database.Command", Serilog.Events.LogEventLevel.Warning)
-        //        .WriteTo.File("logs/yummyapp-performance-log.txt", rollingInterval: RollingInterval.Day)
-        //        .CreateLogger();
-        //}
-
-        //public ILogger CreateMongoLogger()
-        //{
-        //    if (_configuration["App:IsMongoActive"] == "true")
-        //    {
-        //        return new LoggerConfiguration()
-        //            .Enrich.FromLogContext()
-        //            .MinimumLevel.Warning()
-        //            .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database.Command", Serilog.Events.LogEventLevel.Warning)
-        //            .MinimumLevel.Override("Microsoft.AspNetCore", Serilog.Events.LogEventLevel.Warning)
-        //            .WriteTo.MongoDBBson(
-        //                _configuration["MongoDbSettings:ConnectionString"] + "/" + _configuration["MongoDbSettings:DatabaseName"],
-        //                _configuration["MongoDbSettings:LogCollection"])
-        //            .CreateLogger();
-        //    }
-
-        //    return Log.Logger;
-        //}
-
-        public ILogger CreateDatabaseLogger()
+        private Task LogWithContextAsync(string level, string message, Exception? exception = null)
         {
-            var columnOptions = new Serilog.Sinks.MSSqlServer.ColumnOptions();
+            var httpContext = _httpContextAccessor.HttpContext;
+            var userId = httpContext?.User?.FindFirst("uid")?.Value ?? "Anonymous";
+            var ipAddress = httpContext?.Connection?.RemoteIpAddress?.ToString() ?? "Unknown";
+            var endpoint = httpContext?.Request?.Path.Value ?? "Unknown";
 
-            // 🔹 Varsayılan "Exception" sütununu tekrar eklememek için kaldırıyoruz.
-            columnOptions.Store.Remove(Serilog.Sinks.MSSqlServer.StandardColumn.MessageTemplate);
-            columnOptions.Store.Remove(Serilog.Sinks.MSSqlServer.StandardColumn.Properties);
+            // 🔹 Log mesajını yapılandır
+            var logger = _logger
+                .ForContext("UserId", userId)
+                .ForContext("IPAddress", ipAddress)
+                .ForContext("Endpoint", endpoint)
+                //.ForContext("Level", level)
+                .ForContext("Message", message)
+                //.ForContext("Exception", exception?.ToString())
+                .ForContext("CreatedAt", DateTime.UtcNow);  // ⏳ Tarihi UTC olarak logla
 
-            columnOptions.AdditionalColumns = new List<Serilog.Sinks.MSSqlServer.SqlColumn>
-    {
-        new Serilog.Sinks.MSSqlServer.SqlColumn { ColumnName = "UserId", DataType = SqlDbType.NVarChar, DataLength = 100, AllowNull = true },
-        new Serilog.Sinks.MSSqlServer.SqlColumn { ColumnName = "IPAddress", DataType = SqlDbType.NVarChar, DataLength = 100, AllowNull = true },
-        new Serilog.Sinks.MSSqlServer.SqlColumn { ColumnName = "Endpoint", DataType = SqlDbType.NVarChar, DataLength = 200, AllowNull = true }
-    };
+            // 🔹 Loglama seviyesine göre uygun metodu çağır
+            switch (level)
+            {
+                case "Information":
+                    logger.Information("{Level}: {Message}", level, message);
+                    break;
+                case "Warning":
+                    logger.Warning("{Level}: {Message}", level, message);
+                    break;
+                case "Error":
+                    logger.Error(exception, "{Level}: {Message}", level, message);
+                    break;
+                case "Critical":
+                    logger.Fatal(exception, "{Level}: {Message}", level, message);
+                    break;
+                default:
+                    logger.Warning("Unknown log level: {Level}. Message: {Message}", level, message);
+                    break;
+            }
 
-            return new LoggerConfiguration()
-                .Enrich.FromLogContext()
-                .MinimumLevel.Warning() // Sadece Warning ve Error loglarını kaydet
-                .WriteTo.MSSqlServer(
-                    connectionString: _configuration["ConnectionStrings:DefaultConnection"],
-                    sinkOptions: new Serilog.Sinks.MSSqlServer.MSSqlServerSinkOptions
-                    {
-                        TableName = "LogEntries",
-                        AutoCreateSqlTable = false // 🔹 Eğer tablo migration ile oluşturulduysa, bunu false yap!
-                    },
-                    columnOptions: columnOptions)
-                .CreateLogger();
+            Console.WriteLine($"✅ LOG KAYDEDİLDİ: {message} (Seviye: {level})");
+            return Task.CompletedTask;
         }
 
 
-
+        public Task LogInformation(string message) => LogWithContextAsync("Information", message);
+        public Task LogWarning(string message) => LogWithContextAsync("Warning", message);
+        public Task LogError(string message, Exception? exception = null)
+            => LogWithContextAsync("Error", message, exception);
+        public Task LogCritical(string message, Exception? exception = null)
+            => LogWithContextAsync("Critical", message, exception);
     }
 }
+
