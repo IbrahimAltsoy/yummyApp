@@ -6,10 +6,11 @@ using Xunit;
 using WebAPI;
 using Microsoft.VisualStudio.TestPlatform.TestHost;
 using System.Text;
-using System.Text.Json; // API projenin adını buraya yazmalısın
+using System.Text.Json; 
 
 public class UserControllerTests : IClassFixture<WebApplicationFactory<Program>>
 {
+    #region Contructyr kısmı
     private readonly HttpClient _client;
 
     public UserControllerTests()
@@ -19,137 +20,138 @@ public class UserControllerTests : IClassFixture<WebApplicationFactory<Program>>
             BaseAddress = new Uri("http://192.168.1.100:7009") // API'nin gerçek adresi
         };
     }
-    #region
-    //[Fact]   
-    //public async Task GetAllUsers_ShouldReturn200OK_And_ValidUserList()
-    //{
-    //    try
-    //    {
-    //        var response = await _client.GetAsync("/api/User");
-
-    //        // Response durum kodunu yazdır
-    //        Console.WriteLine($"[TEST LOG] Response Status: {response.StatusCode}");
-
-    //        // Yanıt içeriğini JSON olarak oku
-    //        var responseBody = await response.Content.ReadAsStringAsync();
-    //        Console.WriteLine($"[TEST LOG] Response Body: {responseBody}");
-
-    //        // Eğer response başarısızsa, hata ver
-    //        response.EnsureSuccessStatusCode();
-
-    //        // JSON'ı modelimize çevir
-    //        var userList = await response.Content.ReadFromJsonAsync<GetAllUserQueryResponse>();
-
-    //        // Kullanıcı listesi boş mu kontrol et
-    //        userList.Should().NotBeNull();
-    //        userList.Users.Should().NotBeNull();
-    //        userList.TotalUserCount.Should().BeGreaterThan(0);
-    //    }
-    //    catch (HttpRequestException httpEx)
-    //    {
-    //        Console.WriteLine($"[TEST LOG] HTTP Hatası: {httpEx.Message}");
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        Console.WriteLine($"[TEST LOG] Genel Hata: {ex.Message}");
-    //    }
-    //}
-
-
-    //[Fact]
-    //public async Task GetUserById_ShouldReturn200OK_WhenUserExists()
-    //{
-    //    // Arrange (Önce bir kullanıcı oluşturalım)
-    //    var newUser = new CreateUserCommandRequest
-    //    {
-    //        Name = "ibrahim",
-    //        Surname = "Altsoy",
-    //        UserName = "i.ako@gmail.com",
-    //        Email = "sam784@gmail.com",
-    //        PhoneNumber = "123456789",
-    //        Birthday = DateTime.UtcNow,
-    //        Gender = Gender.Male,
-    //        Password = "SecurePassword123",
-    //        PasswordConfirm = "SecurePassword123"
-    //    };
-
-    //    var postResponse = await _client.PostAsJsonAsync("/api/User", newUser);
-    //    var createdUser = await postResponse.Content.ReadFromJsonAsync<CreateUserCommandResponse>();
-
-    //    Guid userId = createdUser.Id; // API response içinde ID olmalı!
-
-    //    // Act (Oluşturulan kullanıcıyı çek)
-    //    var response = await _client.GetAsync($"/api/User/id?id={userId}");
-
-    //    // Assert
-    //    response.StatusCode.Should().Be(HttpStatusCode.OK);
-    //}
-
-    //[Fact]
-    //public async Task CreateUser_ShouldReturn201Created()
-    //{
-    //    // Arrange
-    //    var newUser = new CreateUserCommandRequest
-    //    {
-    //        Name = "John",
-    //        Surname = "Doe",
-    //        UserName = "jodoe",
-    //        Email = "jo47e@example.com",
-    //        PhoneNumber = "987654321",
-    //        Birthday = DateTime.UtcNow.AddYears(-25),
-    //        Gender = Gender.Male,
-    //        Password = "StrongPassword!",
-    //        PasswordConfirm = "StrongPassword!"
-    //    };
-
-    //    // Act
-    //    var response = await _client.PostAsJsonAsync("/api/User", newUser);
-
-    //    // Assert
-    //    response.StatusCode.Should().Be(HttpStatusCode.Created);
-    //}
-
-    //[Fact]
-    //public async Task UpdateUser_ShouldReturn200OK()
-    //{
-    //    // Arrange (Önce bir kullanıcı ekleyelim)
-    //    var newUser = new CreateUserCommandRequest
-    //    {
-    //        Name = "UpdateTest",
-    //        Surname = "User",
-    //        UserName = "uphfdatetestuser",
-    //        Email = "updaser@example.com",
-    //        PhoneNumber = "987654321",
-    //        Birthday = DateTime.UtcNow.AddYears(-30),
-    //        Gender = Gender.Male,
-    //        Password = "UpdatePassword",
-    //        PasswordConfirm = "UpdatePassword"
-    //    };
-
-    //    var postResponse = await _client.PostAsJsonAsync("/api/User", newUser);
-    //    var createdUser = await postResponse.Content.ReadFromJsonAsync<CreateUserCommandResponse>();
-
-    //    Guid userId = createdUser.Id;
-
-    //    var updatedUser = new UpdateUserCommandRequest
-    //    {
-    //        Id = userId,
-    //        Name = "Updated",
-    //        Surname = "User",
-    //        UserName = "uateduser",
-    //        Email = "updd@gmail.com",
-    //        PhoneNumber = "123456789",
-    //        Birthday = DateTime.UtcNow.AddYears(-28),
-    //        IsActive = true
-    //    };
-
-    //    // Act
-    //    var response = await _client.PutAsJsonAsync("/api/User", updatedUser);
-
-    //    // Assert
-    //    response.StatusCode.Should().Be(HttpStatusCode.OK);
-    //}
     #endregion
+    #region User Test Kodları
+    [Fact]
+    public async Task GetAllUsers_ShouldReturn200OK_And_ValidUserList()
+    {
+        try
+        {
+            var response = await _client.GetAsync("/api/User");
+
+            // Response durum kodunu yazdır
+            Console.WriteLine($"[TEST LOG] Response Status: {response.StatusCode}");
+
+            // Yanıt içeriğini JSON olarak oku
+            var responseBody = await response.Content.ReadAsStringAsync();
+            Console.WriteLine($"[TEST LOG] Response Body: {responseBody}");
+
+            // Eğer response başarısızsa, hata ver
+            response.EnsureSuccessStatusCode();
+
+            // JSON'ı modelimize çevir
+            var userList = await response.Content.ReadFromJsonAsync<GetAllUserQueryResponse>();
+
+            // Kullanıcı listesi boş mu kontrol et
+            userList.Should().NotBeNull();
+            userList.Users.Should().NotBeNull();
+            userList.TotalUserCount.Should().BeGreaterThan(0);
+        }
+        catch (HttpRequestException httpEx)
+        {
+            Console.WriteLine($"[TEST LOG] HTTP Hatası: {httpEx.Message}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[TEST LOG] Genel Hata: {ex.Message}");
+        }
+    }
+
+
+    [Fact]
+    public async Task GetUserById_ShouldReturn200OK_WhenUserExists()
+    {
+        // Arrange (Önce bir kullanıcı oluşturalım)
+        var newUser = new CreateUserCommandRequest
+        {
+            Name = "ibrahim",
+            Surname = "Altsoy",
+            UserName = "i.ako@gmail.com",
+            Email = "sam784@gmail.com",
+            PhoneNumber = "123456789",
+            Birthday = DateTime.UtcNow,
+            Gender = Gender.Male,
+            Password = "SecurePassword123",
+            PasswordConfirm = "SecurePassword123"
+        };
+
+        var postResponse = await _client.PostAsJsonAsync("/api/User", newUser);
+        var createdUser = await postResponse.Content.ReadFromJsonAsync<CreateUserCommandResponse>();
+
+        Guid userId = createdUser.Id; // API response içinde ID olmalı!
+
+        // Act (Oluşturulan kullanıcıyı çek)
+        var response = await _client.GetAsync($"/api/User/id?id={userId}");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+    }
+
+    [Fact]
+    public async Task CreateUser_ShouldReturn201Created()
+    {
+        // Arrange
+        var newUser = new CreateUserCommandRequest
+        {
+            Name = "John",
+            Surname = "Doe",
+            UserName = "jodoe",
+            Email = "jo47e@example.com",
+            PhoneNumber = "987654321",
+            Birthday = DateTime.UtcNow.AddYears(-25),
+            Gender = Gender.Male,
+            Password = "StrongPassword!",
+            PasswordConfirm = "StrongPassword!"
+        };
+
+        // Act
+        var response = await _client.PostAsJsonAsync("/api/User", newUser);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
+    }
+
+    [Fact]
+    public async Task UpdateUser_ShouldReturn200OK()
+    {
+        // Arrange (Önce bir kullanıcı ekleyelim)
+        var newUser = new CreateUserCommandRequest
+        {
+            Name = "UpdateTest",
+            Surname = "User",
+            UserName = "uphfdatetestuser",
+            Email = "updaser@example.com",
+            PhoneNumber = "987654321",
+            Birthday = DateTime.UtcNow.AddYears(-30),
+            Gender = Gender.Male,
+            Password = "UpdatePassword",
+            PasswordConfirm = "UpdatePassword"
+        };
+
+        var postResponse = await _client.PostAsJsonAsync("/api/User", newUser);
+        var createdUser = await postResponse.Content.ReadFromJsonAsync<CreateUserCommandResponse>();
+
+        Guid userId = createdUser.Id;
+
+        var updatedUser = new UpdateUserCommandRequest
+        {
+            Id = userId,
+            Name = "Updated",
+            Surname = "User",
+            UserName = "uateduser",
+            Email = "updd@gmail.com",
+            PhoneNumber = "123456789",
+            Birthday = DateTime.UtcNow.AddYears(-28),
+            IsActive = true
+        };
+
+        // Act
+        var response = await _client.PutAsJsonAsync("/api/User", updatedUser);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+    }
+    
     [Fact]
     public async Task CreateAndDeleteUser_ShouldReturn200OK()
     {
@@ -198,12 +200,12 @@ public class UserControllerTests : IClassFixture<WebApplicationFactory<Program>>
 
         deleteResponse.StatusCode.Should().Be(HttpStatusCode.OK); // API'nin dönüşüne göre NoContent yerine OK olarak düzelttim.
     }
-
+    #endregion
 
 
 }
 
-// Kullanıcı API'si dönüş modelleri
+#region Kullanıcı Modelleri
 public class GetAllUserQueryResponse
 {
     public int TotalUserCount { get; set; }
@@ -259,3 +261,4 @@ public enum Gender
     Female = 2
 }
 
+#endregion

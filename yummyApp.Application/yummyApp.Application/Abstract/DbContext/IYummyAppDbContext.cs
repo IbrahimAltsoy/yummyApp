@@ -15,6 +15,7 @@ namespace yummyApp.Application.Abstract.DbContext
         DbSet<BusinessLocation> BusinessLocations { get; set; }
         DbSet<PostLocation> PostLocations { get; set; }
         DbSet<AppUser> AppUsers { get; set; }
+        DbSet<UserFeedback> UserFeedbacks { get; set; }
         //DbSet<LogEntry> LogEntries { get; set; }
 
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);

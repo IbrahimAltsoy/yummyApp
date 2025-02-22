@@ -30,7 +30,8 @@ namespace yummyApp.Domain.Identity
         public ICollection<Message>? SentMessages { get; set; }
         public ICollection<Message>? ReceivedMessages { get; set; }
         public ICollection<BusinessReview>? BusinessReviews { get; set; }
-        
+        public ICollection<UserFeedback>? UserFeedbacks { get; set; }
+
         public DateTime CreatedAt { get; set; }
         public string? CreatedBy { get; set; }
         public DateTime? LastModifiedAt { get; set; }

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace yummyApp.Persistance.Migrations
 {
     /// <inheritdoc />
-    public partial class mig_1 : Migration
+    public partial class mig_initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -95,29 +95,6 @@ namespace yummyApp.Persistance.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Businesses", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "LogEntries",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Level = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Message = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Exception = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UserId = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IPAddress = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Endpoint = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    LastModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    LastModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedBy = table.Column<string>(type: "nvarchar(max)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_LogEntries", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -300,6 +277,35 @@ namespace yummyApp.Persistance.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "UserFeedbacks",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserID = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Message = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UserFeedbackEnum = table.Column<int>(type: "int", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsAddressed = table.Column<bool>(type: "bit", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LastModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    LastModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeletedBy = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserFeedbacks", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserFeedbacks_AspNetUsers_UserID",
+                        column: x => x.UserID,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "UserLocation",
                 columns: table => new
                 {
@@ -396,7 +402,7 @@ namespace yummyApp.Persistance.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Content = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Timestamp = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2025, 2, 18, 11, 50, 13, 57, DateTimeKind.Utc).AddTicks(7473)),
+                    Timestamp = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2025, 2, 22, 9, 55, 45, 397, DateTimeKind.Utc).AddTicks(2771)),
                     Quality = table.Column<int>(type: "int", nullable: false),
                     Rating = table.Column<int>(type: "int", nullable: false),
                     UserID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -778,6 +784,11 @@ namespace yummyApp.Persistance.Migrations
                 column: "PostID");
 
             migrationBuilder.CreateIndex(
+                name: "IX_UserFeedbacks_UserID",
+                table: "UserFeedbacks",
+                column: "UserID");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_UserLocation_UserId",
                 table: "UserLocation",
                 column: "UserId");
@@ -837,9 +848,6 @@ namespace yummyApp.Persistance.Migrations
                 name: "Likes");
 
             migrationBuilder.DropTable(
-                name: "LogEntries");
-
-            migrationBuilder.DropTable(
                 name: "Medias");
 
             migrationBuilder.DropTable(
@@ -850,6 +858,9 @@ namespace yummyApp.Persistance.Migrations
 
             migrationBuilder.DropTable(
                 name: "Tags");
+
+            migrationBuilder.DropTable(
+                name: "UserFeedbacks");
 
             migrationBuilder.DropTable(
                 name: "UserLocation");

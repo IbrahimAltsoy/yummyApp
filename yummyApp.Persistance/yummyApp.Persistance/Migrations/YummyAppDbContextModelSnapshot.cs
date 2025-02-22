@@ -583,7 +583,7 @@ namespace yummyApp.Persistance.Migrations
                     b.Property<DateTime>("Timestamp")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2025, 2, 21, 7, 41, 20, 899, DateTimeKind.Utc).AddTicks(1937));
+                        .HasDefaultValue(new DateTime(2025, 2, 22, 9, 55, 45, 397, DateTimeKind.Utc).AddTicks(2771));
 
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)");
@@ -681,6 +681,57 @@ namespace yummyApp.Persistance.Migrations
                     b.HasIndex("PostID");
 
                     b.ToTable("Tags");
+                });
+
+            modelBuilder.Entity("yummyApp.Domain.Entities.UserFeedback", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool?>("IsAddressed")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserFeedbackEnum")
+                        .HasColumnType("int");
+
+                    b.Property<Guid?>("UserID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("UserFeedbacks");
                 });
 
             modelBuilder.Entity("yummyApp.Domain.Entities.UserLocation", b =>
@@ -1202,6 +1253,16 @@ namespace yummyApp.Persistance.Migrations
                     b.Navigation("Post");
                 });
 
+            modelBuilder.Entity("yummyApp.Domain.Entities.UserFeedback", b =>
+                {
+                    b.HasOne("yummyApp.Domain.Identity.AppUser", "User")
+                        .WithMany("UserFeedbacks")
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("yummyApp.Domain.Entities.UserLocation", b =>
                 {
                     b.HasOne("yummyApp.Domain.Identity.AppUser", "User")
@@ -1290,6 +1351,8 @@ namespace yummyApp.Persistance.Migrations
                     b.Navigation("Reviews");
 
                     b.Navigation("SentMessages");
+
+                    b.Navigation("UserFeedbacks");
                 });
 #pragma warning restore 612, 618
         }
