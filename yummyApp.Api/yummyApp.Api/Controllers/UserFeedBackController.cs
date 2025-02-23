@@ -6,6 +6,7 @@ using yummyApp.Application.Features.UserFeedBacks.Commands.Delete;
 using yummyApp.Application.Features.UserFeedBacks.Commands.Update;
 using yummyApp.Application.Features.UserFeedBacks.Queries.Get;
 using yummyApp.Application.Features.UserFeedBacks.Queries.GetById;
+using yummyApp.Application.Features.UserFeedBacks.Queries.GetIsAddressed;
 
 namespace yummyApp.Api.Controllers
 {
@@ -20,15 +21,22 @@ namespace yummyApp.Api.Controllers
             _mediator = mediator;
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("id")]
         public async Task<IActionResult> GetById([FromQuery] GetByIdUserFeedBackQueryRequest request)
         {
             GetByIdUserFeedBackQueryResponse response = await _mediator.Send(request);
             return Ok(response);
         }
+        [HttpGet("status")]
+        public async Task<IActionResult> GetStatus([FromQuery] GetIsAddressedUserFeedbackQueryRequest request)
+        {
+            GetAllUserFeedBackQueryResult response = await _mediator.Send(request);
+            return Ok(response);
+        }
+        [HttpGet]
         public async Task<IActionResult> Get([FromQuery] GetAllUserFeedBackQueryRequest request)
         {
-            GetAllUserFeedBackQueryResponse response = await _mediator.Send(request);
+            GetAllUserFeedBackQueryResult response = await _mediator.Send(request);
             return Ok(response);
         }
         [HttpPost]

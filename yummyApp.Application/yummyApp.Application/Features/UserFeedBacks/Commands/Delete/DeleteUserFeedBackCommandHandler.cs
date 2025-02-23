@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using MediatR;
 using yummyApp.Application.Repositories.Repository;
+using yummyApp.Domain.Entities;
 
 namespace yummyApp.Application.Features.UserFeedBacks.Commands.Delete
 {
@@ -15,9 +16,14 @@ namespace yummyApp.Application.Features.UserFeedBacks.Commands.Delete
             _repository = repository;
         }
 
-        public Task<DeleteUserFeedBackCommandResponse> Handle(DeleteUserFeedBackCommandRequest request, CancellationToken cancellationToken)
+        public async Task<DeleteUserFeedBackCommandResponse> Handle(DeleteUserFeedBackCommandRequest request, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            var data = _mapper.Map<UserFeedback>(request);
+           var deletedData =  await _repository.DeleteAsync(data, permanent:true);
+            if (deletedData !=null) return new DeleteUserFeedBackCommandResponse() { Message = "Feedback başarıyla silindi.", Success = true };
+            return new DeleteUserFeedBackCommandResponse() { Message ="Feedback bilgisi silinemedi.",Success = false };
+
+
         }
     }
 }

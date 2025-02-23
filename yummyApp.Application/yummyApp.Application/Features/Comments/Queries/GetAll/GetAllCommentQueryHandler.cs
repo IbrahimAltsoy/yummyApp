@@ -10,11 +10,10 @@ namespace yummyApp.Application.Features.Comments.Queries.GetAll
     {
         readonly IMapper _mapper;
         readonly ICommentRepository _commentRepository;
-        readonly IYummyAppDbContext _dbContext;
+       
 
-        public GetAllCommentQueryHandler(IMapper mapper, ICommentRepository commentRepository, IYummyAppDbContext dbContext)
-        {
-            _dbContext = dbContext;
+        public GetAllCommentQueryHandler(IMapper mapper, ICommentRepository commentRepository)
+        {           
             _mapper = mapper;
             _commentRepository = commentRepository;
         }
