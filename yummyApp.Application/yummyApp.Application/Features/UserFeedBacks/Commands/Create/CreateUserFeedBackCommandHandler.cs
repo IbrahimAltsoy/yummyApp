@@ -23,10 +23,12 @@ namespace yummyApp.Application.Features.UserFeedBacks.Commands.Create
         public async Task<CreateUserFeedBackCommandResponse> Handle(CreateUserFeedBackCommandRequest request, CancellationToken cancellationToken)
         {
             if (!Guid.TryParse(_user.Id, out Guid userId))
-            {
+            {               
                 throw new ArgumentException("Current user ID is not a valid GUID.");
             }
-            request.UserID = userId;           
+            
+            request.UserID = userId;
+            request.Email = _user.Email;
             var data = _mapper.Map<UserFeedback>(request);
             await _repository.AddAsync(data);
             data.AddDomainEvent(new UserFeedBackCreatedEvent(data));
