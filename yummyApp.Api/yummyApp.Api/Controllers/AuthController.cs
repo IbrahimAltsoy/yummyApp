@@ -94,5 +94,12 @@ namespace yummyApp.Api.Controllers
             NewPasswordCommandResponse response = await _mediator.Send(request);
             return Ok(response);
         }
+        [HttpPost("google-login")]
+        public async Task<IActionResult> GoogleLogin(GoogleLoginCommandRequest request)
+        {
+            GoogleLoginCommandResponse response = await _mediator.Send(request);
+            return Ok(response);
+        }
+
     }
 }

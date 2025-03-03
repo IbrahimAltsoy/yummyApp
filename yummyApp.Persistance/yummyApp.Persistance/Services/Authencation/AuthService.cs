@@ -117,50 +117,108 @@ namespace yummyApp.Persistance.Services.Authencation
             }
             return false;
         }
+        //public async Task<Token> GoogleLoginAsync(string idToken, int accessTokenLifeTime)
+        //{
+        //    var settings = new GoogleJsonWebSignature.ValidationSettings()
+        //    {
+        //        Audience = new List<string> { _configuration["Google:PROVIDER_ID"]! }
+        //    };
+        //    var payload = await GoogleJsonWebSignature.ValidateAsync(idToken, settings);
+        //    var info = new UserLoginInfo("GOOGLE", payload.Subject, "GOOGLE");
+
+
+        //    AppUser? user = await _userManager.FindByLoginAsync(info.LoginProvider, info.ProviderKey);
+        //    bool result = user != null;
+        //    if (user == null)
+        //    {
+        //        user = await _userManager.FindByEmailAsync(payload.Email);
+        //        if (user == null)
+        //        {
+        //            user = new AppUser()
+        //            {                      
+        //                Email = payload.Email,
+        //                UserName = payload.Email,
+        //                Surname = payload.Name,
+        //                Name = payload.Name,
+        //            };
+        //            var identiyResult = await _userManager.CreateAsync(user);
+        //            result = identiyResult.Succeeded;
+        //        }
+        //    }
+        //    if (result)
+        //    {
+        //        await _userManager.AddLoginAsync(user, info);
+        //        //Token token = _tokenHandler.CreateAccessToken(15 * 60, user);
+        //        Token token =await _tokenHandler.CreateAccessTokenAsync(15 * 60, user);
+        //        await _userService.UpdateRefreshToken(token.RefreshToken, user, token.Expiration, 5 * 60);
+        //        return token;
+
+        //    }
+        //    else
+        //    {
+        //        throw new Exception("Invalid external authacation.");
+        //    }
+
+
+
+        //}
         public async Task<Token> GoogleLoginAsync(string idToken, int accessTokenLifeTime)
         {
+            // 1️⃣ Google'ın public key'leriyle token doğrulama ayarlarını al
             var settings = new GoogleJsonWebSignature.ValidationSettings()
             {
-                Audience = new List<string> { _configuration["Google:PROVIDER_ID"]! }
+                Audience = new List<string> { _configuration["Authentication:Google:ClientId"]! } // Daha güvenli hale getirdik
             };
-            var payload = await GoogleJsonWebSignature.ValidateAsync(idToken, settings);
-            var info = new UserLoginInfo("GOOGLE", payload.Subject, "GOOGLE");
 
-
-            AppUser? user = await _userManager.FindByLoginAsync(info.LoginProvider, info.ProviderKey);
-            bool result = user != null;
-            if (user == null)
+            try
             {
-                user = await _userManager.FindByEmailAsync(payload.Email);
+                // 2️⃣ Google Token'ı doğrula
+                var payload = await GoogleJsonWebSignature.ValidateAsync(idToken, settings);
+
+                if (payload == null)
+                    throw new Exception("Google kimlik doğrulaması başarısız.");
+
+                var info = new UserLoginInfo("GOOGLE", payload.Subject, "GOOGLE");
+
+                // 3️⃣ Kullanıcı Google hesabıyla daha önce giriş yapmış mı kontrol et
+                var user = await _userManager.FindByLoginAsync(info.LoginProvider, info.ProviderKey);
+
                 if (user == null)
                 {
-                    user = new AppUser()
-                    {                      
-                        Email = payload.Email,
-                        UserName = payload.Email,
-                        Surname = payload.Name,
-                        Name = payload.Name,
-                    };
-                    var identiyResult = await _userManager.CreateAsync(user);
-                    result = identiyResult.Succeeded;
+                    // 4️⃣ Kullanıcı daha önce giriş yapmadıysa, e-posta ile kaydı var mı kontrol et
+                    user = await _userManager.FindByEmailAsync(payload.Email);
+                    if (user == null)
+                    {
+                        // Yeni bir kullanıcı oluştur
+                        user = new AppUser()
+                        {
+                            Email = payload.Email,
+                            UserName = payload.Email,
+                            Surname = payload.FamilyName, // Soyadını FamilyName olarak güncelledik
+                            Name = payload.GivenName      // Adını GivenName olarak güncelledik
+                        };
+                        var identityResult = await _userManager.CreateAsync(user);
+
+                        if (!identityResult.Succeeded)
+                            throw new Exception("Kullanıcı oluşturulurken hata oluştu.");
+                    }
+
+                    // Google hesabını kullanıcıya bağla
+                    await _userManager.AddLoginAsync(user, info);
                 }
-            }
-            if (result)
-            {
-                await _userManager.AddLoginAsync(user, info);
-                //Token token = _tokenHandler.CreateAccessToken(15 * 60, user);
-                Token token =await _tokenHandler.CreateAccessTokenAsync(15 * 60, user);
+
+                // 5️⃣ Kullanıcıya yeni bir JWT Token oluştur
+                Token token = await _tokenHandler.CreateAccessTokenAsync(accessTokenLifeTime, user);
+
+                // 6️⃣ Refresh token'ı güncelle
                 await _userService.UpdateRefreshToken(token.RefreshToken, user, token.Expiration, 5 * 60);
+
                 return token;
-
             }
-            else
+            catch (Exception ex)
             {
-                throw new Exception("Invalid external authacation.");
+                throw new Exception($"Google Login hatası: {ex.Message}");
             }
-
-
-
         }
 
         public async Task<RegisterCommandResponse> RegisterAsync(RegisterCommandRequest request)
@@ -185,8 +243,8 @@ namespace yummyApp.Persistance.Services.Authencation
                 {
                     string encodedEmail = Uri.EscapeDataString(request.Email);
                     string encodedActivationCode = Uri.EscapeDataString(activeCode);
-                string mobileBaseUrl = _configuration["ApplicationSettings:MobileApplication"]!;
-                string activationLink = $"{mobileBaseUrl}/api/Auth/verify-email?Email={encodedEmail}&ActivationCode={encodedActivationCode}";
+                string mobileBaseUrl = _configuration["ApplicationSettings:AdminApplication"]!;
+                string activationLink = $"{mobileBaseUrl}/Auth/verifyemail?Email={encodedEmail}&ActivationCode={encodedActivationCode}";
                     await _emailService.SendMailAsync(
                         request.Email,
                         "Aktivasyon Kodu",

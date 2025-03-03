@@ -30,6 +30,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application.Tests", "Applic
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebAPI.Tests", "WebAPI.Tests\WebAPI.Tests.csproj", "{2503CF7E-7C21-43B8-B2EB-385731BC9083}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "yummyApp.Web", "yummyApp.Web", "{81DE8C90-814E-4186-A54F-4860E1546A94}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "yummyApp.Web", "yummyApp.Web\yummyApp.Web.csproj", "{1502D546-9645-4169-8429-D3A5E9AA7208}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -64,6 +68,10 @@ Global
 		{2503CF7E-7C21-43B8-B2EB-385731BC9083}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2503CF7E-7C21-43B8-B2EB-385731BC9083}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2503CF7E-7C21-43B8-B2EB-385731BC9083}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1502D546-9645-4169-8429-D3A5E9AA7208}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1502D546-9645-4169-8429-D3A5E9AA7208}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1502D546-9645-4169-8429-D3A5E9AA7208}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1502D546-9645-4169-8429-D3A5E9AA7208}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -76,6 +84,7 @@ Global
 		{1CD5AC26-2DB6-4F9D-8EDB-746017877F1E} = {B5B2A106-4893-4897-A4DD-FD197D2B9492}
 		{A8DBC2B5-07C3-402A-87B4-2A79E5B33B2F} = {7AED6481-2667-4F51-B360-FCD172D15417}
 		{2503CF7E-7C21-43B8-B2EB-385731BC9083} = {7AED6481-2667-4F51-B360-FCD172D15417}
+		{1502D546-9645-4169-8429-D3A5E9AA7208} = {81DE8C90-814E-4186-A54F-4860E1546A94}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {16A09BC8-35F8-4C5E-AF98-24B72E18C4B9}
