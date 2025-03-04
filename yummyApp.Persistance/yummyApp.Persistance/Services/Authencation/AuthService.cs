@@ -21,6 +21,7 @@ using yummyApp.Application.Features.Users.Rules;
 using Azure.Core;
 using System.Net;
 using yummyApp.Persistance.Services.Email;
+using Microsoft.AspNetCore.WebUtilities;
 
 
 
@@ -76,7 +77,7 @@ namespace yummyApp.Persistance.Services.Authencation
                 return token;
 
             }
-            throw new AuthenticationErrorExceptions();
+            throw new AuthenticationErrorExceptions("Email veya Şifre yanlış girdiniz.");
         }
 
         public async Task<Token> RefreshTokenLoginAsync(string refreshToken)
@@ -112,7 +113,7 @@ namespace yummyApp.Persistance.Services.Authencation
             AppUser? user = await _userManager.FindByIdAsync(userId);
             if (user != null)
             {                
-                resetToken = resetToken.UrlDecode();
+               //resetToken = resetToken.UrlDecode();
                 return await _userManager.VerifyUserTokenAsync(user, _userManager.Options.Tokens.PasswordResetTokenProvider, "ResetPassword", resetToken);
             }
             return false;
@@ -268,7 +269,7 @@ namespace yummyApp.Persistance.Services.Authencation
         {
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null) return false;
-            string decodedToken = Uri.UnescapeDataString(token);            
+            var decodedToken = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(token));
             var resetPasswordResult = await _userManager.ResetPasswordAsync(user, decodedToken, newPassword);
             if (!resetPasswordResult.Succeeded)
             {

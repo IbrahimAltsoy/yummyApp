@@ -14,7 +14,7 @@ namespace yummyApp.Application.Features.Users.Commands.PasswordReset
 
         public async Task<PasswordResetCommandResponse> Handle(PasswordResetCommandRequest request, CancellationToken cancellationToken)
         {
-            await _authService.ResetPasswordAsync(request.Email);
+            await _authService.ResetPasswordAsync(request.Email!);
             return new() { Message = "Şifre için gelen emaili kontrol ediniz.", Success = true };
         }
     }

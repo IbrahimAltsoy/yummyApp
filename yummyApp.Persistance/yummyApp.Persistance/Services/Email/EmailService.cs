@@ -4,6 +4,7 @@ using System.Net;
 using System.Text;
 using yummyApp.Application.Services.Email;
 using System.Security.Cryptography;
+using Microsoft.AspNetCore.WebUtilities;
 
 namespace yummyApp.Persistance.Services.Email
 {
@@ -23,8 +24,8 @@ namespace yummyApp.Persistance.Services.Email
         }
 
         public async Task SendActivationEmailAsync(string email, string activationCode)
-        {
-            string activationLink = $"https://localhost:5218/api/Auth/VerifyEmail?Email={Uri.EscapeDataString(email)}&ActivationCode={Uri.EscapeDataString(activationCode)}";
+        {           
+            string activationLink = _configuration["ApplicationSettings:AdminApplication"]!+ $"/api/Auth/VerifyEmail?Email={email}&ActivationCode={activationCode}";
             await SendMailAsync(
                 email,
                 "Aktivasyon Kodu",
@@ -74,9 +75,10 @@ namespace yummyApp.Persistance.Services.Email
         public async Task SendPasswordResetMailAsync(string to, string userId, string resetToken)
         {
 
-            StringBuilder mail = new();
+            StringBuilder mail = new();            
+            var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(resetToken));
             mail.AppendLine("Merhaba<br>Eğer yeni şifre talebinde bulunduysanız aşağıdaki linkten şifrenizi yenileyebilirsiniz.<br>");
-            mail.AppendLine("<strong><a target=\"_blank\" href=\"" + _configuration["AngularClientUrl"] + "/updatepassword/" + userId + "/" + resetToken + "\">Yeni şifre talebi için tıklayınız...</a></strong><br><br>");
+            mail.AppendLine("<strong><a target=\"_blank\" href=\"" + _configuration["ApplicationSettings:AdminApplication"]! + "/Auth/UpdatePassword/" + userId + "/" + encodedToken + "\">Yeni şifre talebi için tıklayınız...</a></strong><br><br>");
 
             mail.AppendLine("<span style=\"font-size:12px;\">NOT : Eğer ki bu talep tarafınızca gerçekleştirilmemişse lütfen bu maili ciddiye almayınız.</span><br>");
             mail.AppendLine("Saygılarımızla...<br><br><br>yummyApp Company");
