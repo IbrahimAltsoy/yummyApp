@@ -44,11 +44,11 @@ namespace yummyApp.Persistance.Services.Email
                 smtp.Credentials = new NetworkCredential(_configuration["Mail:Username"], _configuration["Mail:Password"]);
                 smtp.Port = 587;
                 smtp.EnableSsl = true; // Güvenli bağlantıyı etkinleştirin
-                smtp.Host = _configuration["Mail:Host"];
+                smtp.Host = _configuration["Mail:Host"]!;
 
                 using (MailMessage mail = new MailMessage())
                 {
-                    mail.From = new MailAddress(_configuration["Mail:Username"], "Yummy Application");
+                    mail.From = new MailAddress(_configuration["Mail:Username"]!, "Yummy Application");
                     mail.Subject = subject;
                     mail.Body = body;
                     mail.IsBodyHtml = isBodyHtml;
