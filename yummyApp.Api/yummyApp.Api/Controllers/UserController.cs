@@ -12,6 +12,7 @@ using yummyApp.Application.Features.Users.Queries.GetUserById;
 
 namespace yummyApp.Api.Controllers
 {
+    
     [Route("api/[controller]")]
     [ApiController]
     public class UserController : ControllerBase
@@ -22,7 +23,7 @@ namespace yummyApp.Api.Controllers
         {
             _mediator = mediator;
         }
-        [AllowAnonymous]
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<IActionResult> Get([FromQuery] GetAllUserQueryRequest request)
         {
@@ -30,18 +31,21 @@ namespace yummyApp.Api.Controllers
             return Ok(response);
 
         }
+        [Authorize]
         [HttpGet("id")]
         public async Task<IActionResult> GetById([FromQuery] GetUserByIdQueryRequest request)
         {
             GetUserByIdQueryResponse response = await _mediator.Send(request);
             return Ok(response);
         }
+        [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> Post([FromBody]CreateUserCommandRequest request)
         {
             CreateUserCommandResponse response = await _mediator.Send(request);
             return Ok(response);
         }
+        [Authorize]
         [HttpPut]
         public async Task<IActionResult> Update([FromBody]UpdateUserCommandRequest request)
         {
@@ -49,6 +53,7 @@ namespace yummyApp.Api.Controllers
 
             return Ok("Güncelleme başarılı bir şekilde yapılmıştır.");
         }
+        [Authorize]
         [HttpDelete]
         public async Task<IActionResult> Delete([FromBody]DeleteUserCommandRequest request)
         {

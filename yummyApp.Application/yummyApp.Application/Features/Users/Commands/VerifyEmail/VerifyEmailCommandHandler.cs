@@ -1,5 +1,8 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.WebUtilities;
+using System.Text;
+using System.Web;
 using yummyApp.Application.Abstract.DbContext;
 using yummyApp.Application.Repositories.Repository;
 using yummyApp.Application.Services.Users;
@@ -21,6 +24,7 @@ namespace yummyApp.Application.Features.Users.Commands.VerifyEmail
 
         public async Task<VerifyEmailCommandResponse> Handle(VerifyEmailCommandRequest request, CancellationToken cancellationToken)
         {
+            
             AppUser? user = await _userManager.FindByEmailAsync(request.Email);
             if (user == null || user.ActivationCode != request.ActivationCode)
                 return new VerifyEmailCommandResponse()

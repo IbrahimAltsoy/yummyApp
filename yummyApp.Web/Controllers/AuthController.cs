@@ -29,7 +29,7 @@ namespace yummyApp.Web.Controllers
                 Email = email,
                 ActivationCode = activationCode
             };
-            var requestUri = _configuration["ApplicationSettings:ApiApplication"]!+ $"/api/Auth/verify-email?Email={email}&activationCode={activationCode}";
+            var requestUri = _configuration["ApplicationSettings:ApiApplication"]+ $"/api/Auth/verify-email?Email={email}&activationCode={activationCode}";
             var response = await _httpClient.GetAsync(requestUri);
             
             if (response.IsSuccessStatusCode)

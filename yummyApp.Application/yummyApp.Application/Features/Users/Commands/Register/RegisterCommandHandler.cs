@@ -14,7 +14,15 @@ namespace yummyApp.Application.Features.Users.Commands.Register
 
         public async Task<RegisterCommandResponse> Handle(RegisterCommandRequest request, CancellationToken cancellationToken)
         {
-           RegisterCommandResponse response = await _authService.RegisterAsync(new()
+            if (request.Password != request.PasswordConfirm)
+            {
+                return new RegisterCommandResponse
+                {
+                    Success = false,
+                    Message = "Şifre ve şifre tekrarı eşleşmiyor!"
+                };
+            }
+            RegisterCommandResponse response = await _authService.RegisterAsync(new()
            {
                Name = request.Name,
                Surname = request.Surname,

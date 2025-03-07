@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
@@ -10,6 +11,7 @@ using yummyApp.Persistance.Services.Logging;
 
 namespace yummyApp.Api.Controllers
 {
+    [Authorize(Roles ="User")]
     [Route("api/[controller]")]
     [ApiController]
     public class ApiController : ControllerBase
@@ -42,24 +44,5 @@ namespace yummyApp.Api.Controllers
 
             return Ok(data);
         }
-        [HttpGet("throw-validation-exception")]
-        public async Task<IActionResult> ThrowValidationException()
-        {
-            throw new ValidationException();
-        }
-
-        [HttpGet("throw-not-found-exception")]
-        public async Task<IActionResult> ThrowNotFoundException()
-        {
-            throw new NotFoundException("kullanıcı", "Bulunmadı");
-        }
-
-        [HttpGet("throw-generic-exception")]
-        public async Task<IActionResult> ThrowGenericException()
-        {
-            throw new Exception("This is a generic error.");
-        }
-
-
     }
 }

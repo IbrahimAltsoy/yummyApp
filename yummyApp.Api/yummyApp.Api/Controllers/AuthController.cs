@@ -68,7 +68,7 @@ namespace yummyApp.Api.Controllers
             VerifyEmailCommandResponse response = await _mediator.Send(request);
            return Ok(response);
         }
-        [AllowAnonymous]
+       
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] UserLoginCommandRequest request)
         {

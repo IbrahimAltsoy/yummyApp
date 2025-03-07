@@ -7,6 +7,7 @@ using Serilog;
 using ILogger = Serilog.ILogger;
 using System;
 using yummyApp.Domain.Entities;
+using yummyApp.Application.Exceptions.AuthExceptions;
 
 
 namespace yummyApp.Api.Infrastructure
@@ -24,7 +25,9 @@ namespace yummyApp.Api.Infrastructure
             { typeof(UnauthorizedAccessException), StatusCodes.Status401Unauthorized },
             { typeof(ForbiddenAccessException), StatusCodes.Status403Forbidden },
             { typeof(ServiceException), StatusCodes.Status500InternalServerError },
-            { typeof(SqlException), StatusCodes.Status500InternalServerError }
+            { typeof(SqlException), StatusCodes.Status500InternalServerError },
+            { typeof(UserEmailVerifyCheckException), StatusCodes.Status400BadRequest }
+
         };
 
             public GlobalExceptionHandler(IAppLogger appLogger, IConfiguration configuration, IWebHostEnvironment environment)

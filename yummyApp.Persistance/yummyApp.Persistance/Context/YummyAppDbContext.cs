@@ -19,6 +19,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using yummyApp.Persistance.Configurations;
 
 
 public class YummyAppDbContext : IdentityDbContext<AppUser, UserRole, Guid>, IYummyAppDbContext
@@ -41,11 +42,7 @@ public class YummyAppDbContext : IdentityDbContext<AppUser, UserRole, Guid>, IYu
 
     //public DbSet<LogEntry> LogEntries { get; set; }
 
-    public DbSet<AppUser> AppUsers { get; set; }
-
-   // public DbSet<User> Users { get; set; }
-
-    
+    public DbSet<AppUser> AppUsers { get; set; }    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -86,9 +83,8 @@ public class YummyAppDbContext : IdentityDbContext<AppUser, UserRole, Guid>, IYu
         {
             relationship.DeleteBehavior = DeleteBehavior.Restrict;
         }
-        // Fluent API konfigürasyonlarını uygulamak
-
-        modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+        // Fluent API konfigürasyonlarını uygulamak        
+        modelBuilder.ApplyConfiguration(new UserConfigration());       
     }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

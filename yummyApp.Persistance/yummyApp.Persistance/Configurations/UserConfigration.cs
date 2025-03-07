@@ -8,10 +8,9 @@ namespace yummyApp.Persistance.Configurations
     {
         public void Configure(EntityTypeBuilder<AppUser> builder)
         {
-           
-            builder.Property(x => x.Name).HasMaxLength(50).IsRequired();
-            builder.Property(x => x.Surname).HasMaxLength(50).IsRequired();
-            builder.Property(x => x.Email).HasMaxLength(50).IsRequired();
+            builder.Property(x => x.Name).HasMaxLength(50).HasAnnotation("MinLength", 3).IsRequired(true);
+            builder.Property(x => x.Surname).HasMaxLength(50).HasAnnotation("MinLength", 3).IsRequired(true);
+            builder.Property(x => x.Email).HasMaxLength(50).IsRequired(true);
             builder.Property(x => x.Email)
                .HasConversion(
                     email => email.ToLower(),
@@ -19,10 +18,6 @@ namespace yummyApp.Persistance.Configurations
                .IsUnicode(false)
                .HasColumnType("varchar(50)")
                .IsRequired();
-            //builder.Property(x => x.Gender).IsRequired();
-           
-
-
         }
     }
 }

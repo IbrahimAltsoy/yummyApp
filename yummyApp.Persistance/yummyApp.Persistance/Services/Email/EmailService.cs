@@ -5,6 +5,7 @@ using System.Text;
 using yummyApp.Application.Services.Email;
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.WebUtilities;
+using System.Text.RegularExpressions;
 
 namespace yummyApp.Persistance.Services.Email
 {
@@ -19,13 +20,18 @@ namespace yummyApp.Persistance.Services.Email
 
         public Task<string> CreateEmailActivationKey()
         {
-            string key = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
+            byte[] bytes = RandomNumberGenerator.GetBytes(64);
+            string key = Convert.ToBase64String(bytes)
+                .Replace("+", "-") 
+                .Replace("/", "_")  
+                .TrimEnd('='); 
             return Task.FromResult(key);
         }
 
         public async Task SendActivationEmailAsync(string email, string activationCode)
-        {           
-            string activationLink = _configuration["ApplicationSettings:AdminApplication"]!+ $"/api/Auth/VerifyEmail?Email={email}&ActivationCode={activationCode}";
+        {
+            var encodedActivationCode = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(activationCode));
+            string activationLink = _configuration["ApplicationSettings:AdminApplication"]!+ $"/api/Auth/VerifyEmail?Email={email}&ActivationCode={encodedActivationCode}";
             await SendMailAsync(
                 email,
                 "Aktivasyon Kodu",
@@ -39,11 +45,20 @@ namespace yummyApp.Persistance.Services.Email
 
         public async Task SendMailAsync(string[] tos, string subject, string body, bool isBodyHtml = true)
         {
+            // E-posta adreslerini kontrol et
+            foreach (var to in tos)
+            {
+                if (!IsValidEmail(to))
+                {
+                    throw new Exception($"Geçersiz e-posta adresi: {to}");
+                }
+            }
+
             using (SmtpClient smtp = new SmtpClient())
             {
                 smtp.Credentials = new NetworkCredential(_configuration["Mail:Username"], _configuration["Mail:Password"]);
                 smtp.Port = 587;
-                smtp.EnableSsl = true; // Güvenli bağlantıyı etkinleştirin
+                smtp.EnableSsl = true;
                 smtp.Host = _configuration["Mail:Host"]!;
 
                 using (MailMessage mail = new MailMessage())
@@ -64,10 +79,22 @@ namespace yummyApp.Persistance.Services.Email
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"SendMailAsync Hatası: {ex.ToString()}");
-                        throw;
+                        throw new Exception("E-posta gönderilirken bir hata oluştu.", ex);
                     }
                 }
+            }
+        }
+
+        private bool IsValidEmail(string email)
+        {
+            try
+            {               
+                var regex = new Regex(@"^[^@\s]+@[^@\s]+\.[^@\s]+$");
+                return regex.IsMatch(email);
+            }
+            catch
+            {
+                return false;
             }
         }
 
@@ -86,5 +113,6 @@ namespace yummyApp.Persistance.Services.Email
 
 
         }
+        
     }
 }

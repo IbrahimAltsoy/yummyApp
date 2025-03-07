@@ -19,7 +19,7 @@ namespace yummyApp.Application.Features.Users.Rules
         {
             _userManager = userManager;
             _emailService = emailService;
-            _baseUrl = configuration["ApplicationSettings:MobileApplication"]!;
+            _baseUrl = configuration["ApplicationSettings:AdminApplication"]!;
         }
         public Task UserShouldBeExists(AppUser? user)
         {
@@ -42,7 +42,7 @@ namespace yummyApp.Application.Features.Users.Rules
                 await _userManager.UpdateAsync(user);
                 string encodedEmail = Uri.EscapeDataString(user.Email!);
                 string encodedActivationCode = Uri.EscapeDataString(activeCode);
-                string activationLink = $"{_baseUrl}/api/Auth/VerifyEmail?Email={encodedEmail}&ActivationCode={encodedActivationCode}";
+                string activationLink = $"{_baseUrl}/Auth/VerifyEmail?Email={encodedEmail}&ActivationCode={encodedActivationCode}";
                 await _emailService.SendMailAsync(
                     user.Email,
                     "Aktivasyon Kodu",

@@ -56,28 +56,51 @@ namespace yummyApp.Persistance.Services.Authencation
             _authBusinessRules = authBusinessRules;
            
         }
+        //public async Task<Token> LoginAsync(string userNameOrEmail, string password, int accessTokenLifeTime)
+        //{
+        //    AppUser? user = await _userManager.FindByNameAsync(userNameOrEmail);
+
+        //    if (user == null)
+        //        user = await _userManager.FindByEmailAsync(userNameOrEmail);
+        //    if (user == null)
+        //        throw new NotFoundUserExceptions();
+        //    await _authBusinessRules.UserShouldBeExists(user);
+        //    await _authBusinessRules.UserEmailVerifyCheck(user);
+        //    SignInResult result = await _signInManager.CheckPasswordSignInAsync(user, password, false);
+        //    if (result.Succeeded)
+        //    {
+
+        //        //Token token = _tokenHandler.CreateAccessToken(accessTokenLifeTime, user);
+        //        Token token =await  _tokenHandler.CreateAccessTokenAsync(accessTokenLifeTime, user);
+        //        await _userService.UpdateRefreshToken(token.RefreshToken, user, token.Expiration, 5 * 60);
+
+        //        return token;
+
+        //    }
+        //    throw new AuthenticationErrorExceptions("Email veya Şifre yanlış girdiniz.");
+        //}
         public async Task<Token> LoginAsync(string userNameOrEmail, string password, int accessTokenLifeTime)
         {
             AppUser? user = await _userManager.FindByNameAsync(userNameOrEmail);
-            
+
             if (user == null)
                 user = await _userManager.FindByEmailAsync(userNameOrEmail);
-            if (user == null)
-                throw new NotFoundUserExceptions();
+
+            // Kullanıcı bulunamazsa veya şifre yanlışsa aynı hata mesajını döndür
+            if (user == null || !await _userManager.CheckPasswordAsync(user, password))
+            {
+                throw new NotFoundUserExceptions("Email veya Şifre yanlış girdiniz.");
+            }
+
+            // Kullanıcı doğrulama işlemleri
             await _authBusinessRules.UserShouldBeExists(user);
             await _authBusinessRules.UserEmailVerifyCheck(user);
-            SignInResult result = await _signInManager.CheckPasswordSignInAsync(user, password, false);
-            if (result.Succeeded)
-            {
 
-                //Token token = _tokenHandler.CreateAccessToken(accessTokenLifeTime, user);
-                Token token =await  _tokenHandler.CreateAccessTokenAsync(accessTokenLifeTime, user);
-                await _userService.UpdateRefreshToken(token.RefreshToken, user, token.Expiration, 5 * 60);
-                
-                return token;
+            // Token oluşturma ve refresh token güncelleme
+            Token token = await _tokenHandler.CreateAccessTokenAsync(accessTokenLifeTime, user);
+            await _userService.UpdateRefreshToken(token.RefreshToken, user, token.Expiration, 5 * 60);
 
-            }
-            throw new AuthenticationErrorExceptions("Email veya Şifre yanlış girdiniz.");
+            return token;
         }
 
         public async Task<Token> RefreshTokenLoginAsync(string refreshToken)
