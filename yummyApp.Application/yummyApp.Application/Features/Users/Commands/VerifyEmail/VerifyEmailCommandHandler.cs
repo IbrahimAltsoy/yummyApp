@@ -14,30 +14,40 @@ namespace yummyApp.Application.Features.Users.Commands.VerifyEmail
     {
         readonly UserManager<AppUser> _userManager;
         readonly IUserService _userService;
-       
+
         public VerifyEmailCommandHandler(UserManager<AppUser> userManager, IUserService userService)
         {
             _userManager = userManager;
-            _userService = userService;            
-           
+            _userService = userService;
+
         }
 
         public async Task<VerifyEmailCommandResponse> Handle(VerifyEmailCommandRequest request, CancellationToken cancellationToken)
         {
-            
+
+            // **Düzgün decoding yapıyoruz**
+            string decodedActivationCode = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(request.ActivationCode));
+
+            // Kullanıcıyı veritabanında bul
             AppUser? user = await _userManager.FindByEmailAsync(request.Email);
-            if (user == null || user.ActivationCode != request.ActivationCode)
+            if (user == null || user.ActivationCode != decodedActivationCode)
+            {
                 return new VerifyEmailCommandResponse()
                 {
                     Succeeded = false,
                     Message = "Doğrulama başarısız! Lütfen kontrol ediniz!"
                 };
+            }
 
-            user.IsActive = true; 
+            // Kullanıcıyı aktif hale getir
+            user.IsActive = true;
             user.ActivationCode = "";
             user.EmailConfirmed = true;
             await _userManager.UpdateAsync(user);
+
+            // Kullanıcıya rol ekle
             await _userManager.AddToRoleAsync(user, "User");
+
             return new VerifyEmailCommandResponse()
             {
                 Succeeded = true,

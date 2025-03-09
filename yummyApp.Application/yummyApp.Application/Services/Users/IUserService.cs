@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using yummyApp.Application.Abstract.Common;
 using yummyApp.Application.Dtos.Users;
 using yummyApp.Application.Features.Users.Commands.Create;
@@ -16,6 +17,7 @@ namespace yummyApp.Application.Services.Users
         Task UpdatePasswordAsync(Guid userId, string resetToken, string newPassword);
         Task<bool> SoftDeleteUserAsync(Guid userId);
         Task<bool> HardDeleteUserAsync(Guid userId);
+        Task<bool> UpdateUserProfileImageAsync(Guid userId, IFormFile profileImage);
         //Task<string> GetUserRoleAsync(UserReadDto user);
     }
 }

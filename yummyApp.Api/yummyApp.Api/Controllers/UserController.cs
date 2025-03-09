@@ -7,6 +7,7 @@ using yummyApp.Application.BackGroundJobs;
 using yummyApp.Application.Features.Users.Commands.Create;
 using yummyApp.Application.Features.Users.Commands.Delete;
 using yummyApp.Application.Features.Users.Commands.Update;
+using yummyApp.Application.Features.Users.Commands.UpdateUserProfileImage;
 using yummyApp.Application.Features.Users.Queries.GetAll;
 using yummyApp.Application.Features.Users.Queries.GetUserById;
 
@@ -47,11 +48,23 @@ namespace yummyApp.Api.Controllers
         }
         [Authorize]
         [HttpPut]
-        public async Task<IActionResult> Update([FromBody]UpdateUserCommandRequest request)
+        public async Task<IActionResult> Update([FromBody] UpdateUserCommandRequest request)
         {
             UpdateUserCommandResponse response = await _mediator.Send(request);
 
             return Ok("Güncelleme başarılı bir şekilde yapılmıştır.");
+
+        }
+        [Authorize]
+        [HttpPost("updateImage")]
+        public async Task<IActionResult> UpdateImage(IFormFile image )
+        {
+            UpdateUserProfileImageCommandRequest request = new UpdateUserProfileImageCommandRequest
+            {
+                Image = image
+            };
+            UpdateUserProfileImageCommandResponse response = await _mediator.Send(request);
+            return Ok(response);
         }
         [Authorize]
         [HttpDelete]

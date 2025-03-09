@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -17,6 +18,7 @@ using yummyApp.Application.Services.Email;
 using yummyApp.Application.Services.Users;
 using yummyApp.Application.Tokens;
 using yummyApp.Domain.Identity;
+using yummyApp.Infrastructure.Storage.Google;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace yummyApp.Persistance.Services.Users
@@ -28,14 +30,16 @@ namespace yummyApp.Persistance.Services.Users
         readonly IYummyAppDbContext _dbContext;
         readonly ITokenHandler _tokenHandler;
         readonly IEmailService _emailService;
+        readonly IGoogleCloudStorageService _storageService;
 
-        public UserService(UserManager<AppUser> userManager, IMapper mapper, IYummyAppDbContext dbContext, ITokenHandler tokenHandler, IEmailService emailService)
+        public UserService(UserManager<AppUser> userManager, IMapper mapper, IYummyAppDbContext dbContext, ITokenHandler tokenHandler, IEmailService emailService, IGoogleCloudStorageService storageService)
         {
             _userManager = userManager;
             _mapper = mapper;
             _dbContext = dbContext;
             _tokenHandler = tokenHandler;
             _emailService = emailService;
+            _storageService = storageService;
         }
 
         public async Task<CreateUserCommandResponse> CreateUserAsync(UserCreateDto userCreate)
@@ -114,10 +118,6 @@ namespace yummyApp.Persistance.Services.Users
             return false;
         }
 
-
-
-
-
         public async Task<List<UserReadDto>> GetUserAllAsync()
         {
             List<AppUser> users =  _dbContext.AppUsers.ToList();
@@ -176,6 +176,22 @@ namespace yummyApp.Persistance.Services.Users
             //user.PasswordHash = userCreate.Password;
             var result = await _userManager.UpdateAsync(user);
             return result;
+        }
+
+        public async Task<bool> UpdateUserProfileImageAsync(Guid userId, IFormFile profileImage)
+        {
+            var user = await _dbContext.AppUsers.FindAsync(userId);
+            if (user == null)
+                return false;
+            if (!string.IsNullOrEmpty(user.ImageUrl))
+            {
+                await _storageService.DeleteImageAsync(user.ImageUrl);
+            }
+            var newImageUrl = await _storageService.UploadImageAsync(profileImage);
+            user.ImageUrl = newImageUrl;
+
+            await _dbContext.SaveChangesAsync();
+            return true;
         }
     }
 }
