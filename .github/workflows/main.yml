@@ -1,52 +1,42 @@
-name: Deploy to Plesk FTP
+name: Build and Deploy to Plesk FTP
 
 on:
   push:
     branches:
-      - master  # veya hangi branch'ı kullanıyorsan
+      - master
 
 jobs:
   build:
-    runs-on: windows-latest
-
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Setup .NET
+      - name: Setup .NET Core SDK
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '9.0.x'  # Kendi .NET sürümüne göre güncelle
+          dotnet-version: '7.0.x' # Kullanılan .NET versiyonunu doğrulayın
 
-      - name: Restore Dependencies
+      - name: Restore dependencies
         run: dotnet restore ./yummyApp.sln
 
-      - name: Build API Project
-        run: dotnet build ./yummyApp.Api/yummyApp.Api.csproj -c Release --no-restore
+      - name: Build API
+        run: dotnet build ./yummyApp.Api/yummyApp.Api/yummyApp.Api.csproj -c Release --no-restore
 
-      - name: Build Web Project
-        run: dotnet build ./yummyApp.Web/yummyApp.Web.csproj -c Release --no-restore
+      - name: Publish API
+        run: dotnet publish ./yummyApp.Api/yummyApp.Api/yummyApp.Api.csproj -c Release -r win-x64 --self-contained false -o publish/api
 
-      - name: Publish API Project
-        run: dotnet publish ./yummyApp.Api/yummyApp.Api.csproj -c Release -r win-x64 --self-contained false -o publish/api
+      - name: Build Web
+        run: dotnet build ./yummyApp.Web/yummyApp.Web/yummyApp.Web.csproj -c Release --no-restore
 
-      - name: Publish Web Project
-        run: dotnet publish ./yummyApp.Web/yummyApp.Web.csproj -c Release -r win-x64 --self-contained false -o publish/web
+      - name: Publish Web
+        run: dotnet publish ./yummyApp.Web/yummyApp.Web/yummyApp.Web.csproj -c Release -r win-x64 --self-contained false -o publish/web
 
-      - name: Upload API to FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      - name: Deploy to Plesk via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./publish/api/
-          server-dir: /httpdocs/api/
-
-      - name: Upload Web to FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./publish/web/
-          server-dir: /httpdocs/web/
+          local-dir: ./publish/
+          server-dir: /httpdocs/
