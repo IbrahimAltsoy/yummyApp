@@ -9,29 +9,37 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      # Adım 1: Repository'yi checkout et
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Setup .NET Core SDK
+      # Adım 2: .NET 9 SDK'sını kur
+      - name: Setup .NET 9 SDK
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '6.0.x' # Kullanılan .NET versiyonunu doğrulayın
+          dotnet-version: '9.0.x' # .NET 9 kullanıyorsunuz
 
+      # Adım 3: Bağımlılıkları restore et
       - name: Restore dependencies
         run: dotnet restore ./yummyApp.sln
 
+      # Adım 4: API projesini build et
       - name: Build API
-        run: dotnet build ./yummyApp.Api/yummyApp.Api.csproj -c Release --no-restore
+        run: dotnet build ./yummyApp.Api/yummyApp.Api/yummyApp.Api.csproj -c Release --no-restore
 
+      # Adım 5: API projesini publish et
       - name: Publish API
-        run: dotnet publish ./yummyApp.Api/yummyApp.Api.csproj -c Release -r win-x64 --self-contained false -o publish/api
+        run: dotnet publish ./yummyApp.Api/yummyApp.Api/yummyApp.Api.csproj -c Release -r win-x64 --self-contained false -o publish/api
 
+      # Adım 6: Web projesini build et
       - name: Build Web
-        run: dotnet build ./yummyApp.Web/yummyApp.Web.csproj -c Release --no-restore
+        run: dotnet build ./yummyApp.Web/yummyApp.Web/yummyApp.Web.csproj -c Release --no-restore
 
+      # Adım 7: Web projesini publish et
       - name: Publish Web
-        run: dotnet publish ./yummyApp.Web/yummyApp.Web.csproj -c Release -r win-x64 --self-contained false -o publish/web
+        run: dotnet publish ./yummyApp.Web/yummyApp.Web/yummyApp.Web.csproj -c Release -r win-x64 --self-contained false -o publish/web
 
+      # Adım 8: API'yi Plesk'e FTP ile deploy et
       - name: Deploy API to Plesk via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
@@ -41,6 +49,7 @@ jobs:
           local-dir: ./publish/api/
           server-dir: /httpdocs/api/
 
+      # Adım 9: Web'i Plesk'e FTP ile deploy et
       - name: Deploy Web to Plesk via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
