@@ -15,7 +15,7 @@ jobs:
       - name: Setup .NET Core SDK
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '6.0.x' # Kullanılan .NET versiyonunu doğrulayın
+          dotnet-version: '9.0.x' # Kullanılan .NET versiyonunu doğrulayın
 
       - name: Restore dependencies
         run: dotnet restore ./yummyApp.sln
