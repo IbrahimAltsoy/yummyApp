@@ -1,24 +1,50 @@
-name: Deploy to Plesk FTP
+name: Build & Deploy to Plesk FTP
 
 on:
   push:
     branches:
-      - master  # Eğer ana branch'in "main" ise burayı "main" olarak değiştir
+      - master  # Eğer ana branch'in "main" ise burayı "main" yap
 
 jobs:
-  ftp-deploy:
-    name: Deploy via FTP
+  build-and-deploy:
+    name: Build and Deploy ASP.NET Core
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Deploy to Plesk via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.4  # Hata almamak için kesin çalışan versiyon
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '9.0.x'  # .NET sürümünü kendi projenin sürümüne göre değiştir
+
+      - name: Restore Dependencies
+        run: dotnet restore
+
+      - name: Build Application
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Publish API
+        run: dotnet publish ./yummyApp.Api/yummyApp.Api.csproj -c Release -r win-x64 --self-contained false -o publish/api
+
+      - name: Publish MVC
+        run: dotnet publish ./yummyApp.Web/yummyApp.Web.csproj -c Release -r win-x64 --self-contained false -o publish/mvc
+
+      - name: Deploy API to Plesk
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
           server: 104.247.167.18
           username: yummyapp
           password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./
+          local-dir: ./publish/api/
+          server-dir: /httpdocs/api/
+
+      - name: Deploy MVC to Plesk
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: 104.247.167.18
+          username: yummyapp
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./publish/mvc/
           server-dir: /httpdocs/
