@@ -7,8 +7,8 @@ namespace yummyApp.Domain.Identity
 {
     public class AppUser :IdentityUser<Guid>,IAuditableEntity<Guid>
     {
-        public string Name { get; set; }
-        public string Surname { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string Surname { get; set; }=string.Empty;
         public string? Roles { get; set; }
         public string? ActivationKey { get; set; }
         public string? RefreshToken { get; set; }
