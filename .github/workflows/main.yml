@@ -26,7 +26,7 @@ jobs:
         run: dotnet build --configuration Release --no-restore
 
       - name: Publish API
-        run: dotnet publish ./yummyApp.Api/yummyApp.Api.csproj -c Release -r win-x64 --self-contained false -o publish/api
+        run: dotnet publish yummyApp.Api/yummyApp.Api.csproj -c Release -r win-x64 --self-contained false -o publish/api
 
       - name: Publish MVC
         run: dotnet publish yummyApp.Web/yummyApp.Web.csproj -c Release -r win-x64 --self-contained false -o publish/mvc
