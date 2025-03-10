@@ -17,7 +17,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '9.0.x'  # .NET sürümünü kendi projenin sürümne göre değiştir
+          dotnet-version: '9.0.x'  # .NET sürümünü kendi projenin sürümüne göre değiştir
 
       - name: Restore Dependencies
         run: dotnet restore
@@ -26,10 +26,10 @@ jobs:
         run: dotnet build --configuration Release --no-restore
 
       - name: Publish API
-      - run: dotnet publish ./src/yummyApp.Api/yummyApp.Api.csproj -c Release -r win-x64 --self-contained false -o publish/api
-      
+        run: dotnet publish yummyApp.Api/yummyApp.Api.csproj -c Release -r win-x64 --self-contained false -o publish/api
+
       - name: Publish MVC
-        run: dotnet publish ./yummyApp.Web/yummyApp.Web.csproj -c Release -r win-x64 --self-contained false -o publish/mvc
+        run: dotnet publish yummyApp.Web/yummyApp.Web.csproj -c Release -r win-x64 --self-contained false -o publish/mvc
 
       - name: Deploy API to Plesk
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
