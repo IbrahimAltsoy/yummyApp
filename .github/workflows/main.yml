@@ -1,0 +1,24 @@
+name: Deploy to Plesk FTP
+
+on:
+  push:
+    branches:
+      - master  # Eğer ana branch'in "master" ise burayı "master" olarak değiştir
+
+jobs:
+  ftp-deploy:
+    name: Deploy via FTP
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Deploy to Plesk via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4
+        with:
+          server: 104.247.167.18
+          username: yummyapp
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./
+          server-dir: /httpdocs/
