@@ -10,33 +10,42 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v1
+        uses: actions/checkout@v3
 
       - name: Setup .NET Core SDK
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '9.0.x' # Kullanılan .NET versiyonunu doğrulayın
+          dotnet-version: '6.0.x' # Kullanılan .NET versiyonunu doğrulayın
 
       - name: Restore dependencies
         run: dotnet restore ./yummyApp.sln
 
       - name: Build API
-        run: dotnet build ./yummyApp.Api/yummyApp.Api/yummyApp.Api.csproj -c Release --no-restore
+        run: dotnet build ./yummyApp.Api/yummyApp.Api.csproj -c Release --no-restore
 
       - name: Publish API
-        run: dotnet publish ./yummyApp.Api/yummyApp.Api/yummyApp.Api.csproj -c Release -r win-x64 --self-contained false -o publish/api
+        run: dotnet publish ./yummyApp.Api/yummyApp.Api.csproj -c Release -r win-x64 --self-contained false -o publish/api
 
       - name: Build Web
-        run: dotnet build ./yummyApp.Web/yummyApp.Web/yummyApp.Web.csproj -c Release --no-restore
+        run: dotnet build ./yummyApp.Web/yummyApp.Web.csproj -c Release --no-restore
 
       - name: Publish Web
-        run: dotnet publish ./yummyApp.Web/yummyApp.Web/yummyApp.Web.csproj -c Release -r win-x64 --self-contained false -o publish/web
+        run: dotnet publish ./yummyApp.Web/yummyApp.Web.csproj -c Release -r win-x64 --self-contained false -o publish/web
 
-      - name: Deploy to Plesk via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4
+      - name: Deploy API to Plesk via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./publish/
+          local-dir: ./publish/api/
+          server-dir: /httpdocs/api/
+
+      - name: Deploy Web to Plesk via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./publish/web/
           server-dir: /httpdocs/
