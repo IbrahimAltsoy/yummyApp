@@ -179,7 +179,7 @@ if (app.Environment.IsDevelopment())
     {
         var dbContext = scope.ServiceProvider.GetRequiredService<IYummyAppDbContext>();
         var userSeeder = new UserSeeder();
-        await userSeeder.Seed(dbContext);
+       // await userSeeder.Seed(dbContext);
     }
 }
 app.UseHangfireDashboard("/hangfire", new DashboardOptions

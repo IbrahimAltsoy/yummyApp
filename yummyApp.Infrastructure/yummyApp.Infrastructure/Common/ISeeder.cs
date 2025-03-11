@@ -4,6 +4,6 @@ namespace yummyApp.Infrastructure.Common
 {
     public interface ISeeder
     {
-        Task Seed(IYummyAppDbContext context);
+       // Task Seed(IYummyAppDbContext context);
     }
 }
