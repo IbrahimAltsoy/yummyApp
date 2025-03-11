@@ -25,19 +25,19 @@ jobs:
 
       # Adım 4: API projesini build et
       - name: Build API
-        run: dotnet build ./yummyApp.Api/yummyApp.Api/yummyApp.Api.csproj -c Release --no-restore
+        run: dotnet build ./yummyApp.Api/yummyApp.Api.csproj -c Release --no-restore
 
       # Adım 5: API projesini publish et
       - name: Publish API
-        run: dotnet publish ./yummyApp.Api/yummyApp.Api/yummyApp.Api.csproj -c Release -r win-x64 --self-contained false -o publish/api
+        run: dotnet publish ./yummyApp.Api/yummyApp.Api.csproj -c Release -r win-x64 --self-contained false -o publish/api
 
       # Adım 6: Web projesini build et
       - name: Build Web
-        run: dotnet build ./yummyApp.Web/yummyApp.Web/yummyApp.Web.csproj -c Release --no-restore
+        run: dotnet build ./yummyApp.Web/yummyApp.Web.csproj -c Release --no-restore
 
       # Adım 7: Web projesini publish et
       - name: Publish Web
-        run: dotnet publish ./yummyApp.Web/yummyApp.Web/yummyApp.Web.csproj -c Release -r win-x64 --self-contained false -o publish/web
+        run: dotnet publish ./yummyApp.Web/yummyApp.Web.csproj -c Release -r win-x64 --self-contained false -o publish/web
 
       # Adım 8: API'yi Plesk'e FTP ile deploy et
       - name: Deploy API to Plesk via FTP
