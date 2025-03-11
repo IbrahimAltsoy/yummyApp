@@ -25,11 +25,11 @@ jobs:
 
       # Adım 4: API projesini build et
       - name: Build API
-        run: dotnet build ./yummyApp.Api/yummyApp.Api.csproj -c Release --no-restore
+        run: dotnet build ./yummyApp.Api/yummyApp.Api/yummyApp.Api.csproj -c Release --no-restore
 
       # Adım 5: API projesini publish et
       - name: Publish API
-        run: dotnet publish ./yummyApp.Api/yummyApp.Api.csproj -c Release -r win-x64 --self-contained false -o publish/api
+        run: dotnet publish ./yummyApp.Api/yummyApp.Api/yummyApp.Api.csproj -c Release -r win-x64 --self-contained false -o publish/api
 
       # Adım 6: Web projesini build et
       - name: Build Web
