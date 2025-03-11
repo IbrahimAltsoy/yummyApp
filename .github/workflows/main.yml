@@ -1,50 +1,60 @@
-name: Build & Deploy to Plesk FTP
+name: Build and Deploy to Plesk FTP
 
 on:
   push:
     branches:
-      - master  # Eğer ana branch'in "main" ise burayı "main" yap
+      - master
 
 jobs:
-  build-and-deploy:
-    name: Build and Deploy ASP.NET Core
+  build:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
+      # Adım 1: Repository'yi checkout et
+      - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Setup .NET
+      # Adım 2: .NET 9 SDK'sını kur
+      - name: Setup .NET 9 SDK
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '9.0.x'  # .NET sürümünü kendi projenin sürümüne göre değiştir
+          dotnet-version: '9.0.x' # .NET 9 kullanıyorsunuz
 
-      - name: Restore Dependencies
-        run: dotnet restore
+      # Adım 3: Bağımlılıkları restore et
+      - name: Restore dependencies
+        run: dotnet restore ./yummyApp.sln
 
-      - name: Build Application
-        run: dotnet build --configuration Release --no-restore
+      # Adım 4: API projesini build et
+      - name: Build API
+        run: dotnet build ./yummyApp.Api/yummyApp.Api/yummyApp.Api.csproj -c Release --no-restore
 
+      # Adım 5: API projesini publish et
       - name: Publish API
-        run: dotnet publish ./yummyApp.Api/yummyApp.Api.csproj -c Release -r win-x64 --self-contained false -o publish/api
+        run: dotnet publish ./yummyApp.Api/yummyApp.Api/yummyApp.Api.csproj -c Release -r win-x64 --self-contained false -o publish/api
 
-      - name: Publish MVC
-        run: dotnet publish ./yummyApp.Web/yummyApp.Web.csproj -c Release -r win-x64 --self-contained false -o publish/mvc
+      # Adım 6: Web projesini build et
+      - name: Build Web
+        run: dotnet build ./yummyApp.Web/yummyApp.Web.csproj -c Release --no-restore
 
-      - name: Deploy API to Plesk
+      # Adım 7: Web projesini publish et
+      - name: Publish Web
+        run: dotnet publish ./yummyApp.Web/yummyApp.Web.csproj -c Release -r win-x64 --self-contained false -o publish/web
+
+      # Adım 8: API'yi Plesk'e FTP ile deploy et
+      - name: Deploy API to Plesk via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
-          server: 104.247.167.18
-          username: yummyapp
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./publish/api/
           server-dir: /httpdocs/api/
 
-      - name: Deploy MVC to Plesk
+      # Adım 9: Web'i Plesk'e FTP ile deploy et
+      - name: Deploy Web to Plesk via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
-          server: 104.247.167.18
-          username: yummyapp
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./publish/mvc/
+          local-dir: ./publish/web/
           server-dir: /httpdocs/
