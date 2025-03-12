@@ -56,7 +56,8 @@ Log.Logger = new LoggerConfiguration()
 #endregion
 
 
-builder.WebHost.UseUrls("http://0.0.0.0:7009"); // burası mobilden giriş yapabilmek için eklendi.
+//builder.WebHost.UseUrls("http://0.0.0.0:7009"); // burası mobilden giriş yapabilmek için eklendi.
+builder.WebHost.UseUrls("http://localhost:7009", "http://0.0.0.0:7009");
 builder.Host.UseSerilog();
 #region Depenejcy Enjection
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
