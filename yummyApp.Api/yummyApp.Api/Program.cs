@@ -200,6 +200,10 @@ app.UseStaticFiles();
 app.UseSerilogRequestLogging(); // HTTP isteklerini logla
 
 app.UseRouting();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers(); // API controller'larını etkinleştir
+});
 app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
@@ -211,6 +215,6 @@ app.UseSwaggerUI(c =>
     c.RoutePrefix = string.Empty;
 });
 
-app.MapControllers();
+//app.MapControllers();
 app.MapFallbackToFile("/app/index.html");
 app.Run();
