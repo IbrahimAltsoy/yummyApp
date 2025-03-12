@@ -37,7 +37,7 @@ columnOptions.TimeStamp.NonClusteredIndex = true;
 columnOptions.Store.Remove(StandardColumn.Properties);
 columnOptions.Store.Remove(StandardColumn.MessageTemplate);
 Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Override("Microsoft", LogEventLevel.Error)  
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Error)
     .MinimumLevel.Override("System", LogEventLevel.Error)
     .MinimumLevel.Error()
     .Enrich.FromLogContext()
@@ -49,15 +49,14 @@ Log.Logger = new LoggerConfiguration()
             AutoCreateSqlTable = true,
             SchemaName = "dbo"
         },
-        columnOptions: columnOptions 
+        columnOptions: columnOptions
     )
     .CreateLogger();
 
 #endregion
 
 
-//builder.WebHost.UseUrls("http://0.0.0.0:7009"); // burası mobilden giriş yapabilmek için eklendi.
-builder.WebHost.UseUrls("http://localhost:7009", "http://0.0.0.0:7009");
+builder.WebHost.UseUrls("http://localhost:7009","http://0.0.0.0:7009"); // burası mobilden giriş yapabilmek için eklendi.
 builder.Host.UseSerilog();
 #region Depenejcy Enjection
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
@@ -97,8 +96,8 @@ builder.Services.AddSwaggerGen(c =>
         Name = "Authorization",
         Type = SecuritySchemeType.ApiKey,
         Scheme = "Bearer",
-        BearerFormat ="JWT"
-        
+        BearerFormat = "JWT"
+
     });
 
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
@@ -132,7 +131,7 @@ builder.Services.AddHangfire(config =>
     config.SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
         .UseSimpleAssemblyNameTypeSerializer()
         .UseRecommendedSerializerSettings()
-        .UseSqlServerStorage(builder.Configuration.GetConnectionString("DefaultConnection")) 
+        .UseSqlServerStorage(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
 builder.Services.AddHangfireServer();
 #endregion
@@ -150,7 +149,7 @@ builder.Services.AddAuthentication(options =>
 
 })
 .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
-{    
+{
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateAudience = true,
@@ -180,7 +179,7 @@ if (app.Environment.IsDevelopment())
     {
         var dbContext = scope.ServiceProvider.GetRequiredService<IYummyAppDbContext>();
         var userSeeder = new UserSeeder();
-       // await userSeeder.Seed(dbContext);
+        //await userSeeder.Seed(dbContext);
     }
 }
 app.UseHangfireDashboard("/hangfire", new DashboardOptions
