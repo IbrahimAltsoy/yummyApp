@@ -16,17 +16,12 @@ namespace yummyApp.Api.Controllers
     [ApiController]
     public class ApiController : ControllerBase
     {
-        readonly IGooglePlacesService _googlePlacesService;
+       
         readonly IMediator _mediator;
-        
-        readonly IConfiguration _configuration;
 
-        public ApiController(IGooglePlacesService googlePlacesService, IMediator mediator, IConfiguration configuration)
-        {
-            _googlePlacesService = googlePlacesService;
-            _mediator = mediator;
-           
-            _configuration = configuration;
+        public ApiController(IMediator mediator)
+        {           
+            _mediator = mediator;          
         }
 
         [HttpGet("get-nearby-places")]
