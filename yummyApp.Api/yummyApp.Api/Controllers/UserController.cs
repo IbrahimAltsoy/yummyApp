@@ -24,7 +24,7 @@ namespace yummyApp.Api.Controllers
         {
             _mediator = mediator;
         }
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<IActionResult> Get([FromQuery] GetAllUserQueryRequest request)
         {

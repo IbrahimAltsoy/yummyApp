@@ -26,9 +26,8 @@ using System.Data.SqlClient;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.TestHost;
 
-
-
 var builder = WebApplication.CreateBuilder(args);
+
 #region Serilog Configuration
 var columnOptions = new ColumnOptions();
 columnOptions.TimeStamp.ColumnName = "TimeStamp";
@@ -52,13 +51,12 @@ Log.Logger = new LoggerConfiguration()
         columnOptions: columnOptions
     )
     .CreateLogger();
-
 #endregion
 
-
-builder.WebHost.UseUrls("http://0.0.0.0:7009"); // burası mobilden giriş yapabilmek için eklendi..
+builder.WebHost.UseUrls("https://localhost:7009"); // Mobilden giriş yapabilmek için eklendi.
 builder.Host.UseSerilog();
-#region Depenejcy Enjection
+
+#region Dependency Injection
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllers();
@@ -68,14 +66,8 @@ builder.Services.AddInfrastructureServices();
 builder.Services.AddHttpClient();
 builder.Services.AddWebApiServices(builder.Configuration);
 #endregion
-#region Test için eklendi
-if (builder.Environment.EnvironmentName == "Testing")
-{
-    //builder.WebHost.UseTestServer();
-}
-#endregion
 
-#region Cors yapılanamsı
+#region Cors Configuration
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", builder =>
@@ -86,6 +78,7 @@ builder.Services.AddCors(options =>
     });
 });
 #endregion
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -97,7 +90,6 @@ builder.Services.AddSwaggerGen(c =>
         Type = SecuritySchemeType.ApiKey,
         Scheme = "Bearer",
         BearerFormat = "JWT"
-
     });
 
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
@@ -124,9 +116,9 @@ builder.Services.AddIdentityCore<AppUser>(options =>
     options.Tokens.PasswordResetTokenProvider = TokenOptions.DefaultProvider;
 })
     .AddEntityFrameworkStores<YummyAppDbContext>()
-    .AddDefaultTokenProviders(); // Şifre sıfırlama ve e-posta doğrulama için gerekli
-//Hangfire işlemleri için
-#region Hangfire yapılanması
+    .AddDefaultTokenProviders();
+
+#region Hangfire Configuration
 builder.Services.AddHangfire(config =>
     config.SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
         .UseSimpleAssemblyNameTypeSerializer()
@@ -135,18 +127,18 @@ builder.Services.AddHangfire(config =>
 );
 builder.Services.AddHangfireServer();
 #endregion
-// Şifre sıfırlama token süresini uzat
+
 builder.Services.Configure<DataProtectionTokenProviderOptions>(options =>
 {
-    options.TokenLifespan = TimeSpan.FromHours(24); // Şifre sıfırlama token süresi 3 saat
+    options.TokenLifespan = TimeSpan.FromHours(24); // Şifre sıfırlama token süresi 24 saat
 });
-#region Jwt yapılandırması
+
+#region Jwt Configuration
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-
 })
 .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
 {
@@ -164,16 +156,13 @@ builder.Services.AddAuthentication(options =>
         NameClaimType = ClaimTypes.NameIdentifier,
     };
 });
-
 #endregion
+
 var app = builder.Build();
 app.UseExceptionHandler(_ => { });
 
-
-//Log.Information("Starting application...");
 if (app.Environment.IsDevelopment())
 {
-    //app.UseDeveloperExceptionPage();
     await app.InitializeDb();
     using (var scope = app.Services.CreateScope())
     {
@@ -182,19 +171,18 @@ if (app.Environment.IsDevelopment())
         //await userSeeder.Seed(dbContext);
     }
 }
+
 app.UseHangfireDashboard("/hangfire", new DashboardOptions
 {
     Authorization = new[] { new HangfireAuthorizationFilter() }
 });
-// 📌 Zamanlanmış Görev 
+
 RecurringJob.AddOrUpdate<UserDeletionJob>(
     x => x.RunScheduledUserDeletion(),
     Cron.Daily(3, 00)
 );
+
 app.UseHangfireServer();
-
-
-//app.UseHttpsRedirection(); // burasının kapanma sebebi mobilden gelen istekleri kabul etsin diye kapatıldı.
 app.UseStaticFiles();
 app.UseSerilogRequestLogging(); // HTTP isteklerini logla
 
@@ -207,9 +195,17 @@ app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "YummyApp API V1");
-    c.RoutePrefix =string.Empty;
+    c.RoutePrefix = "api/swagger"; // Swagger UI'yi /api/swagger altında aç
 });
 
-app.MapControllers();
+app.Use(async (context, next) =>
+{
+    if (context.Request.Path == "/")
+    {
+        context.Response.Redirect("/api/swagger");
+        return;
+    }
+    await next();
+});
 app.MapFallbackToFile("/app/index.html");
 app.Run();
