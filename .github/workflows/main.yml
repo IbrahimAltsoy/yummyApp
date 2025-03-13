@@ -47,7 +47,7 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./publish/api/
-          server-dir: /httpdocs/api/
+          server-dir: /api.yummyapplication.com/
 
       # Adım 9: Web'i Plesk'e FTP ile deploy et
       - name: Deploy Web to Plesk via FTP
