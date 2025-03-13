@@ -67,7 +67,7 @@ builder.Services.AddHttpClient();
 builder.Services.AddWebApiServices(builder.Configuration);
 #endregion
 
-#region Cors Configuration
+#region Cors Configurationu
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", builder =>
