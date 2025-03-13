@@ -7,8 +7,8 @@ using yummyApp.Domain.Identity;
 
 namespace yummyApp.Api.Controllers
 {
-    [Authorize]
-    [Route("api/[controller]")]
+    //[Authorize]
+    [Route("api[controller]")]
     [ApiController]
     public class TestController : ControllerBase
     {
@@ -36,7 +36,7 @@ namespace yummyApp.Api.Controllers
 
             return Ok(places);
         }
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [HttpPost("addRoles")]
         public async Task<IActionResult> AddRoles()
         {            

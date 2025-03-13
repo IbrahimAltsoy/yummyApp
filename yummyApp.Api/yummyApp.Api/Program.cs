@@ -195,17 +195,18 @@ app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "YummyApp API V1");
-    c.RoutePrefix = "api/swagger"; // Swagger UI'yi /api/swagger altında aç
+    c.RoutePrefix = "swagger"; // Swagger UI'yi /api/swagger altında aç
 });
 
-app.Use(async (context, next) =>
-{
-    if (context.Request.Path == "/")
-    {
-        context.Response.Redirect("/api/swagger");
-        return;
-    }
-    await next();
-});
+//app.Use(async (context, next) =>
+//{
+//    if (context.Request.Path == "/")
+//    {
+//        context.Response.Redirect("/api/swagger");
+//        return;
+//    }
+//    await next();
+//});
+app.MapControllers();
 app.MapFallbackToFile("/app/index.html");
 app.Run();

@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace yummyApp.Persistance.Migrations
 {
     [DbContext(typeof(YummyAppDbContext))]
-    [Migration("20250311101814_mig_initial")]
+    [Migration("20250313192001_mig_initial")]
     partial class mig_initial
     {
         /// <inheritdoc />
