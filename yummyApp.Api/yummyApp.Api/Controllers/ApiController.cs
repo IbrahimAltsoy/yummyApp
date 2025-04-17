@@ -11,7 +11,7 @@ using yummyApp.Persistance.Services.Logging;
 
 namespace yummyApp.Api.Controllers
 {
-    [Authorize(Roles ="User")]
+    //[Authorize(Roles ="User")]
     [Route("api/[controller]")]
     [ApiController]
     public class ApiController : ControllerBase

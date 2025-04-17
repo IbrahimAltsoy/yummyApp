@@ -361,3 +361,12 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+# Özel ayar ve gizli dosyalar
+appsettings.json
+appsettings.*.json
+
+# Google servis hesabı json dosyaları
+Secrets/
+*.gcloud.json
+*.serviceaccount.json
+*.json
